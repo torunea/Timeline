@@ -117,17 +117,7 @@
             padding-left: 2px; /* 建築家名の背景とのギャップを作成 */
         }
         
-        /* 建築家名の左側に影を追加して区切りを強調 */
-        .architect-name::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 5px;
-            height: 100%;
-            background: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.3));
-            z-index: 102;
-        }
+        /* シャドウ効果を削除 */
         
         .event-item {
             position: absolute;
@@ -407,11 +397,6 @@
             const timelineHeader = document.createElement('div');
             timelineHeader.className = 'timeline-header';
             
-            // マーカーの前に空白を追加（建築家名の列のため）
-            const emptyMarker = document.createElement('div');
-            emptyMarker.style.width = '150px';
-            emptyMarker.style.flexShrink = '0';
-            
             // 年マーカーを作成
             for (let year = START_YEAR; year <= END_YEAR; year += YEARS_PER_MARKER) {
                 const yearMarker = document.createElement('div');
@@ -424,7 +409,7 @@
             timelineElement.appendChild(timelineHeader);
             
             // 各建築家の行を作成
-            Object.keys(architects).forEach(architectName => {
+            Object.keys(architects).forEach((architectName, index) => {
                 const items = architects[architectName];
                 const bdInfo = birthDeathInfo[architectName] || {};
                 
@@ -436,6 +421,7 @@
                 const nameElement = document.createElement('div');
                 nameElement.className = 'architect-name';
                 nameElement.textContent = architectName;
+                nameElement.style.top = (184 + index * 120) + 'px'; // 位置を調整: ヘッダー(140px) + マージン + 行間隔
                 architectRow.appendChild(nameElement);
                 
                 // 建築家のタイムライン
