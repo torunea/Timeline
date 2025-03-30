@@ -114,6 +114,19 @@
             position: relative;
             margin-left: 150px;
             min-height: 100px;
+            padding-left: 2px; /* 建築家名の背景とのギャップを作成 */
+        }
+        
+        /* 建築家名の左側に影を追加して区切りを強調 */
+        .architect-name::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.3));
+            z-index: 102;
         }
         
         .event-item {
@@ -273,7 +286,7 @@
         const START_YEAR = 1950;
         const END_YEAR = 2025;
         const YEARS_PER_MARKER = 1;
-        const PIXELS_PER_YEAR = 200; // 年ごとの幅を広く設定
+        const PIXELS_PER_YEAR = 100; // 年ごとの幅を広く設定
         
         // ズーム関連
         let zoomLevel = 1;
@@ -398,7 +411,6 @@
             const emptyMarker = document.createElement('div');
             emptyMarker.style.width = '150px';
             emptyMarker.style.flexShrink = '0';
-            timelineHeader.appendChild(emptyMarker);
             
             // 年マーカーを作成
             for (let year = START_YEAR; year <= END_YEAR; year += YEARS_PER_MARKER) {
