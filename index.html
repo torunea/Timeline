@@ -9,40 +9,44 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
         }
         
         body {
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
+            background-color: #f8f9fa;
+            color: #212529;
+            overflow-x: hidden;
         }
         
         header {
-            background-color: #333;
-            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
             padding: 1rem 2rem;
-            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
         
         h1 {
-            font-weight: 300;
+            font-weight: 400;
             letter-spacing: 1px;
+            font-size: 1.5rem;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .filter-controls {
-            margin-bottom: 2rem;
+        .controls {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 0.5rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 999;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
         }
         
         .search-box {
@@ -52,134 +56,110 @@
             border-radius: 4px;
         }
         
-        .category-filter select {
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: white;
+        .container {
+            margin-top: 140px;
+            padding: 1rem;
+            overflow-x: auto;
         }
         
         .timeline {
             position: relative;
-            max-width: 1200px;
-            margin: 0 auto;
+            min-width: 5000px; /* 横スクロールのため十分な幅を確保 */
         }
         
-        .timeline::after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            background-color: #333;
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            margin-left: -3px;
+        .timeline-header {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 1rem;
         }
         
-        .year-container {
-            padding: 10px 40px;
+        .year-marker {
+            flex: 0 0 100px; /* 5年ごとに100px幅 */
+            text-align: center;
+            font-weight: bold;
+            padding: 0.5rem 0;
+            border-right: 1px solid #eee;
+        }
+        
+        .architect-row {
             position: relative;
-            background-color: inherit;
-            width: 50%;
+            margin-bottom: 2rem;
+            min-height: 100px;
         }
         
-        .year-container.left {
-            left: 0;
-        }
-        
-        .year-container.right {
-            left: 50%;
-        }
-        
-        .year-container::after {
-            content: '';
+        .architect-name {
             position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: white;
-            border: 4px solid #FF9F55;
-            border-radius: 50%;
-            top: 15px;
-            right: -13px;
+            top: 0;
+            left: 0;
+            width: 150px;
+            text-align: right;
+            padding-right: 1rem;
+            font-weight: bold;
+            z-index: 5;
+        }
+        
+        .architect-lifespan {
+            position: absolute;
+            top: 0;
+            left: 150px;
+            height: 40px;
+            background-color: rgba(0, 123, 255, 0.1);
+            border: 1px solid rgba(0, 123, 255, 0.3);
+            border-radius: 4px;
             z-index: 1;
         }
         
-        .year-container.right::after {
-            left: -13px;
-        }
-        
-        .year-content {
-            padding: 20px 30px;
-            background-color: white;
+        .architect-timeline {
             position: relative;
-            border-radius: 6px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-left: 150px;
+            padding-top: 50px;
+            min-height: 100px;
         }
         
-        .year {
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: #FF9F55;
-        }
-        
-        .timeline-item {
-            margin-bottom: 0.8rem;
-            padding-bottom: 0.8rem;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .timeline-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .timeline-category {
-            display: inline-block;
-            padding: 2px 8px;
-            margin-right: 5px;
+        .event-item {
+            position: absolute;
+            top: 50px;
+            width: 90px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.5rem;
             font-size: 0.8rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        
+        .event-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 11;
+        }
+        
+        .event-type {
+            display: inline-block;
+            padding: 2px 5px;
+            font-size: 0.7rem;
             border-radius: 3px;
+            margin-bottom: 3px;
         }
         
-        .category-birth {
-            background-color: #e3f2fd;
-            color: #0d47a1;
-        }
-        
-        .category-death {
-            background-color: #fce4ec;
-            color: #880e4f;
-        }
-        
-        .category-building {
+        .event-building {
             background-color: #e8f5e9;
             color: #1b5e20;
         }
         
-        .category-publication {
+        .event-publication {
             background-color: #fff3e0;
             color: #e65100;
         }
         
-        .category-essay {
+        .event-essay {
             background-color: #f3e5f5;
             color: #4a148c;
         }
         
-        .timeline-item-title {
-            font-weight: 500;
-        }
-        
-        .timeline-item-architect {
-            font-style: italic;
-            color: #666;
-        }
-        
-        .timeline-item-description {
-            margin-top: 5px;
-            font-size: 0.9rem;
+        .event-title {
+            font-weight: bold;
+            margin-bottom: 3px;
         }
         
         .loading {
@@ -189,31 +169,37 @@
             color: #666;
         }
         
-        footer {
-            text-align: center;
-            padding: 2rem;
-            background-color: #333;
-            color: white;
-            margin-top: 3rem;
+        .zoom-controls {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 100;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            padding: 0.5rem;
         }
         
-        @media screen and (max-width: 768px) {
-            .timeline::after {
-                left: 31px;
+        .zoom-controls button {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin: 0 0.2rem;
+            cursor: pointer;
+        }
+        
+        .zoom-controls button:hover {
+            background-color: #e9ecef;
+        }
+        
+        @media (max-width: 768px) {
+            .architect-name {
+                width: 100px;
             }
             
-            .year-container {
-                width: 100%;
-                padding-left: 70px;
-                padding-right: 25px;
-            }
-            
-            .year-container.right {
-                left: 0;
-            }
-            
-            .year-container.left::after, .year-container.right::after {
-                left: 18px;
+            .architect-timeline {
+                margin-left: 100px;
             }
         }
     </style>
@@ -223,36 +209,45 @@
         <h1>建築家年表</h1>
     </header>
     
-    <div class="container">
-        <div class="filter-controls">
-            <div class="search">
-                <input type="text" id="search-box" class="search-box" placeholder="建築家名、プロジェクト名で検索...">
-            </div>
-            <div class="category-filter">
-                <select id="category-select">
-                    <option value="all">すべてのカテゴリ</option>
-                    <option value="birth">生年</option>
-                    <option value="death">没年</option>
-                    <option value="building">建築作品</option>
-                    <option value="publication">出版物</option>
-                    <option value="essay">論考</option>
-                </select>
-            </div>
+    <div class="controls">
+        <div class="search">
+            <input type="text" id="search-box" class="search-box" placeholder="建築家名、プロジェクト名で検索...">
         </div>
-        
+        <div class="filter">
+            <select id="filter-select">
+                <option value="all">すべての項目</option>
+                <option value="building">建築作品</option>
+                <option value="publication">出版物</option>
+                <option value="essay">論考</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="container">
         <div id="timeline" class="timeline">
             <div class="loading">データを読み込んでいます...</div>
         </div>
     </div>
     
-    <footer>
-        <p>© 2025 建築家年表 - スプレッドシートデータを使用</p>
-    </footer>
+    <div class="zoom-controls">
+        <button id="zoom-out">-</button>
+        <button id="zoom-reset">リセット</button>
+        <button id="zoom-in">+</button>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script>
         // 公開されたスプレッドシートのURL
         const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pubhtml';
+        
+        // 年表の設定
+        const START_YEAR = 1950;
+        const END_YEAR = 2025;
+        const YEARS_PER_MARKER = 5;
+        const PIXELS_PER_YEAR = 20;
+        
+        // ズーム関連
+        let zoomLevel = 1;
         
         // データの読み込み
         async function loadData() {
@@ -262,9 +257,9 @@
                 const pubId = SPREADSHEET_URL.match(/\/e\/(.+?)\/pubhtml/)[1];
                 
                 // 公開スプレッドシートのCSVエクスポートURL
-                const csvUrl = `https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pub?output=csv`;
+                const csvUrl = `https://docs.google.com/spreadsheets/d/e/${pubId}/pub?output=csv`;
                 
-                const response = await fetch(csvUrl);
+                const response = await fetch(CSV_URL);
                 const csvData = await response.text();
                 
                 // CSVデータをパース
@@ -273,14 +268,8 @@
                     dynamicTyping: true,
                     skipEmptyLines: true,
                     complete: function(results) {
-                        // 読み込んだデータを年順にソート
-                        const sortedData = results.data.sort((a, b) => a.year - b.year);
-                        
-                        // 年表を表示
-                        displayTimeline(sortedData);
-                        
-                        // 検索とフィルタ機能を設定
-                        setupFilters(sortedData);
+                        // データを処理して年表を表示
+                        processData(results.data);
                     },
                     error: function(error) {
                         console.error('データの読み込みに失敗しました:', error);
@@ -302,88 +291,153 @@
             }
         }
         
-        // 年表の表示
-        function displayTimeline(data) {
+        // データの処理と年表の表示
+        function processData(data) {
+            // 建築家ごとにデータをグループ化
+            const architects = {};
+            const birthDeathInfo = {};
+            
+            // 建築家の生没年情報を取得
+            data.forEach(item => {
+                if (!item.architect || !item.year) return;
+                
+                if (!architects[item.architect]) {
+                    architects[item.architect] = [];
+                }
+                
+                architects[item.architect].push(item);
+                
+                // 生没年の情報を記録
+                if (item.category === 'birth') {
+                    if (!birthDeathInfo[item.architect]) {
+                        birthDeathInfo[item.architect] = {};
+                    }
+                    birthDeathInfo[item.architect].birth = item.year;
+                }
+                
+                if (item.category === 'death') {
+                    if (!birthDeathInfo[item.architect]) {
+                        birthDeathInfo[item.architect] = {};
+                    }
+                    birthDeathInfo[item.architect].death = item.year;
+                }
+            });
+            
+            // 年表を描画
+            renderTimeline(architects, birthDeathInfo);
+            
+            // 検索とフィルタ機能をセットアップ
+            setupFilters(data, architects, birthDeathInfo);
+        }
+        
+        // 年表の描画
+        function renderTimeline(architects, birthDeathInfo) {
             const timelineElement = document.getElementById('timeline');
             timelineElement.innerHTML = '';
             
-            // 年ごとにグループ化
-            const groupedByYear = data.reduce((acc, item) => {
-                if (!acc[item.year]) {
-                    acc[item.year] = [];
-                }
-                acc[item.year].push(item);
-                return acc;
-            }, {});
+            // 年マーカーのヘッダーを作成
+            const timelineHeader = document.createElement('div');
+            timelineHeader.className = 'timeline-header';
             
-            // 各年のコンテナを作成
-            let isLeft = true;
-            Object.keys(groupedByYear).sort((a, b) => a - b).forEach(year => {
-                const yearItems = groupedByYear[year];
+            // マーカーの前に空白を追加（建築家名の列のため）
+            const emptyMarker = document.createElement('div');
+            emptyMarker.style.width = '150px';
+            emptyMarker.style.flexShrink = '0';
+            timelineHeader.appendChild(emptyMarker);
+            
+            // 年マーカーを作成
+            for (let year = START_YEAR; year <= END_YEAR; year += YEARS_PER_MARKER) {
+                const yearMarker = document.createElement('div');
+                yearMarker.className = 'year-marker';
+                yearMarker.textContent = year;
+                yearMarker.style.width = (PIXELS_PER_YEAR * YEARS_PER_MARKER) + 'px';
+                timelineHeader.appendChild(yearMarker);
+            }
+            
+            timelineElement.appendChild(timelineHeader);
+            
+            // 各建築家の行を作成
+            Object.keys(architects).forEach(architectName => {
+                const items = architects[architectName];
+                const bdInfo = birthDeathInfo[architectName] || {};
                 
-                const yearContainer = document.createElement('div');
-                yearContainer.className = `year-container ${isLeft ? 'left' : 'right'}`;
+                const architectRow = document.createElement('div');
+                architectRow.className = 'architect-row';
+                architectRow.setAttribute('data-architect', architectName);
                 
-                const yearContent = document.createElement('div');
-                yearContent.className = 'year-content';
+                // 建築家名
+                const nameElement = document.createElement('div');
+                nameElement.className = 'architect-name';
+                nameElement.textContent = architectName;
+                architectRow.appendChild(nameElement);
                 
-                const yearHeader = document.createElement('div');
-                yearHeader.className = 'year';
-                yearHeader.textContent = year;
-                yearContent.appendChild(yearHeader);
-                
-                // その年のイベントを追加
-                yearItems.forEach(item => {
-                    const timelineItem = document.createElement('div');
-                    timelineItem.className = 'timeline-item';
-                    timelineItem.setAttribute('data-category', item.category);
-                    timelineItem.setAttribute('data-architect', item.architect);
-                    timelineItem.setAttribute('data-title', item.title);
+                // 生存期間の帯を表示
+                if (bdInfo.birth && bdInfo.death) {
+                    const lifespanElement = document.createElement('div');
+                    lifespanElement.className = 'architect-lifespan';
                     
-                    // カテゴリラベル
-                    const categorySpan = document.createElement('span');
-                    categorySpan.className = `timeline-category category-${item.category}`;
-                    categorySpan.textContent = getCategoryLabel(item.category);
-                    timelineItem.appendChild(categorySpan);
+                    // 位置を計算
+                    const startPosition = Math.max(0, (bdInfo.birth - START_YEAR) * PIXELS_PER_YEAR);
+                    const endPosition = Math.min((END_YEAR - START_YEAR) * PIXELS_PER_YEAR, (bdInfo.death - START_YEAR) * PIXELS_PER_YEAR);
+                    const width = endPosition - startPosition;
+                    
+                    lifespanElement.style.left = (150 + startPosition) + 'px';
+                    lifespanElement.style.width = width + 'px';
+                    
+                    architectRow.appendChild(lifespanElement);
+                }
+                
+                // 建築家のタイムライン
+                const timelineContainer = document.createElement('div');
+                timelineContainer.className = 'architect-timeline';
+                
+                // イベントを表示
+                items.forEach(item => {
+                    // birth/deathカテゴリは帯として表示済みなのでスキップ
+                    if (item.category === 'birth' || item.category === 'death') return;
+                    
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'event-item';
+                    eventElement.setAttribute('data-category', item.category);
+                    
+                    // 位置を計算
+                    const position = (item.year - START_YEAR) * PIXELS_PER_YEAR;
+                    eventElement.style.left = position + 'px';
+                    
+                    // イベント種類
+                    const typeElement = document.createElement('div');
+                    typeElement.className = `event-type event-${item.category}`;
+                    typeElement.textContent = getCategoryLabel(item.category);
+                    eventElement.appendChild(typeElement);
                     
                     // タイトル
-                    const titleSpan = document.createElement('span');
-                    titleSpan.className = 'timeline-item-title';
-                    titleSpan.textContent = item.title;
-                    timelineItem.appendChild(titleSpan);
+                    const titleElement = document.createElement('div');
+                    titleElement.className = 'event-title';
+                    titleElement.textContent = item.title;
+                    eventElement.appendChild(titleElement);
                     
-                    // 建築家名
-                    if (item.architect) {
-                        const architectSpan = document.createElement('span');
-                        architectSpan.className = 'timeline-item-architect';
-                        architectSpan.textContent = ` - ${item.architect}`;
-                        timelineItem.appendChild(architectSpan);
-                    }
-                    
-                    // 説明文があれば追加
+                    // 説明
                     if (item.description) {
-                        const descriptionDiv = document.createElement('div');
-                        descriptionDiv.className = 'timeline-item-description';
-                        descriptionDiv.textContent = item.description;
-                        timelineItem.appendChild(descriptionDiv);
+                        const descElement = document.createElement('div');
+                        descElement.className = 'event-description';
+                        descElement.textContent = item.description;
+                        eventElement.appendChild(descElement);
                     }
                     
-                    yearContent.appendChild(timelineItem);
+                    timelineContainer.appendChild(eventElement);
                 });
                 
-                yearContainer.appendChild(yearContent);
-                timelineElement.appendChild(yearContainer);
-                
-                // 左右交互に配置
-                isLeft = !isLeft;
+                architectRow.appendChild(timelineContainer);
+                timelineElement.appendChild(architectRow);
             });
+            
+            // ズーム機能をセットアップ
+            setupZoom();
         }
         
-        // カテゴリのラベルを取得
+        // カテゴリ名を表示用に変換
         function getCategoryLabel(category) {
             const labels = {
-                'birth': '誕生',
-                'death': '没',
                 'building': '建築作品',
                 'publication': '出版',
                 'essay': '論考'
@@ -391,43 +445,138 @@
             return labels[category] || category;
         }
         
-        // 検索とフィルタ機能の設定
-        function setupFilters(data) {
+        // フィルタと検索機能のセットアップ
+        function setupFilters(data, architects, birthDeathInfo) {
             const searchBox = document.getElementById('search-box');
-            const categorySelect = document.getElementById('category-select');
+            const filterSelect = document.getElementById('filter-select');
             
             // 検索機能
             searchBox.addEventListener('input', () => {
-                filterTimeline(data, searchBox.value, categorySelect.value);
+                const searchTerm = searchBox.value.toLowerCase();
+                const selectedFilter = filterSelect.value;
+                
+                // 絞り込みデータを作成
+                const filteredArchitects = {};
+                
+                Object.keys(architects).forEach(architectName => {
+                    // 建築家名で検索
+                    if (architectName.toLowerCase().includes(searchTerm)) {
+                        filteredArchitects[architectName] = filterItemsByCategory(architects[architectName], selectedFilter);
+                        return;
+                    }
+                    
+                    // イベントのタイトルや説明で検索
+                    const matchingItems = architects[architectName].filter(item => 
+                        (item.title && item.title.toLowerCase().includes(searchTerm)) ||
+                        (item.description && item.description.toLowerCase().includes(searchTerm))
+                    );
+                    
+                    if (matchingItems.length > 0) {
+                        filteredArchitects[architectName] = filterItemsByCategory(matchingItems, selectedFilter);
+                    }
+                });
+                
+                // 絞り込み結果で年表を再描画
+                renderTimeline(filteredArchitects, birthDeathInfo);
             });
             
             // カテゴリフィルタ
-            categorySelect.addEventListener('change', () => {
-                filterTimeline(data, searchBox.value, categorySelect.value);
+            filterSelect.addEventListener('change', () => {
+                const searchTerm = searchBox.value.toLowerCase();
+                const selectedFilter = filterSelect.value;
+                
+                // 絞り込みデータを作成
+                const filteredArchitects = {};
+                
+                Object.keys(architects).forEach(architectName => {
+                    // 検索語がある場合は検索も適用
+                    if (searchTerm && !architectName.toLowerCase().includes(searchTerm)) {
+                        const matchingItems = architects[architectName].filter(item => 
+                            (item.title && item.title.toLowerCase().includes(searchTerm)) ||
+                            (item.description && item.description.toLowerCase().includes(searchTerm))
+                        );
+                        
+                        if (matchingItems.length > 0) {
+                            filteredArchitects[architectName] = filterItemsByCategory(matchingItems, selectedFilter);
+                        }
+                    } else {
+                        filteredArchitects[architectName] = filterItemsByCategory(architects[architectName], selectedFilter);
+                    }
+                });
+                
+                // 絞り込み結果で年表を再描画
+                renderTimeline(filteredArchitects, birthDeathInfo);
             });
         }
         
-        // 年表のフィルタリング
-        function filterTimeline(data, searchTerm, category) {
-            searchTerm = searchTerm.toLowerCase();
-            
-            // フィルタされたデータを取得
-            let filteredData = data;
-            
-            if (searchTerm) {
-                filteredData = filteredData.filter(item => 
-                    (item.architect && item.architect.toLowerCase().includes(searchTerm)) ||
-                    (item.title && item.title.toLowerCase().includes(searchTerm)) ||
-                    (item.description && item.description.toLowerCase().includes(searchTerm))
-                );
+        // カテゴリによるフィルタリング
+        function filterItemsByCategory(items, category) {
+            if (category === 'all') {
+                return items;
             }
             
-            if (category && category !== 'all') {
-                filteredData = filteredData.filter(item => item.category === category);
-            }
+            return items.filter(item => 
+                item.category === category || item.category === 'birth' || item.category === 'death'
+            );
+        }
+        
+        // ズーム機能のセットアップ
+        function setupZoom() {
+            const zoomInBtn = document.getElementById('zoom-in');
+            const zoomOutBtn = document.getElementById('zoom-out');
+            const zoomResetBtn = document.getElementById('zoom-reset');
+            const timeline = document.getElementById('timeline');
             
-            // フィルタされたデータで年表を再表示
-            displayTimeline(filteredData);
+            zoomInBtn.addEventListener('click', () => {
+                if (zoomLevel < 2) {
+                    zoomLevel += 0.25;
+                    applyZoom();
+                }
+            });
+            
+            zoomOutBtn.addEventListener('click', () => {
+                if (zoomLevel > 0.5) {
+                    zoomLevel -= 0.25;
+                    applyZoom();
+                }
+            });
+            
+            zoomResetBtn.addEventListener('click', () => {
+                zoomLevel = 1;
+                applyZoom();
+            });
+            
+            // ズームを適用
+            function applyZoom() {
+                const yearMarkers = document.querySelectorAll('.year-marker');
+                yearMarkers.forEach(marker => {
+                    marker.style.width = (PIXELS_PER_YEAR * YEARS_PER_MARKER * zoomLevel) + 'px';
+                });
+                
+                const eventItems = document.querySelectorAll('.event-item');
+                eventItems.forEach(item => {
+                    const year = parseInt(item.style.left) / PIXELS_PER_YEAR + START_YEAR;
+                    const newPosition = (year - START_YEAR) * PIXELS_PER_YEAR * zoomLevel;
+                    item.style.left = newPosition + 'px';
+                });
+                
+                const lifespans = document.querySelectorAll('.architect-lifespan');
+                lifespans.forEach(span => {
+                    const left = parseInt(span.style.left.replace('px', ''));
+                    const width = parseInt(span.style.width.replace('px', ''));
+                    
+                    // 元の年を計算
+                    const startYear = (left - 150) / PIXELS_PER_YEAR + START_YEAR;
+                    const endYear = startYear + (width / PIXELS_PER_YEAR);
+                    
+                    // 新しい位置を計算
+                    const newStart = (startYear - START_YEAR) * PIXELS_PER_YEAR * zoomLevel;
+                    const newEnd = (endYear - START_YEAR) * PIXELS_PER_YEAR * zoomLevel;
+                    
+                    span.style.left = (150 + newStart) + 'px';
+                    span.style.width = (newEnd - newStart) + 'px';
+                });
+            }
         }
         
         // ページ読み込み時にデータを取得
