@@ -193,6 +193,7 @@ h1 {
 
 .event-item {
     position: absolute;
+    margin-left: -150px; /* 微妙に合わないので150pxズラして調整 */
     top: 0;
     width: 100px;
     background-color: #2a2a2a;

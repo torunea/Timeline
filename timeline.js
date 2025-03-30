@@ -216,7 +216,7 @@ function renderTimeline(persons, birthDeathInfo) {
             // イベント種類とタイトルを表示するために、幅に合わせてサイズ調整
             // 位置を計算
             const position = (item.year - START_YEAR) * PIXELS_PER_YEAR;
-            eventElement.style.left = (position - 150) + 'px'; // 微妙に合わないので150pxズラして調整
+            eventElement.style.left = position + 'px';
             eventElement.style.width = PIXELS_PER_YEAR + 'px';
             
             // イベント種類
