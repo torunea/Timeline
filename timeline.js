@@ -205,41 +205,110 @@ function renderTimeline(persons, birthDeathInfo) {
         }
         
         // イベントを表示
+        // 人物ごと・年ごとにイベントをグループ化
+        const eventsByYear = {};
+
         items.forEach(item => {
             // birth/deathカテゴリは帯として表示済みなのでスキップ
             if (item.category === 'birth' || item.category === 'death') return;
             
-            const eventElement = document.createElement('div');
-            eventElement.className = 'event-item';
-            eventElement.setAttribute('data-category', item.category);
-            
-            // イベント種類とタイトルを表示するために、幅に合わせてサイズ調整
-            // 位置を計算
-            const position = (item.year - START_YEAR) * PIXELS_PER_YEAR;
-            eventElement.style.left = position + 'px';
-            eventElement.style.width = PIXELS_PER_YEAR + 'px';
-            
-            // イベント種類
-            const typeElement = document.createElement('div');
-            typeElement.className = `event-type event-${item.category}`;
-            typeElement.textContent = getCategoryLabel(item.category);
-            eventElement.appendChild(typeElement);
-            
-            // タイトル
-            const titleElement = document.createElement('div');
-            titleElement.className = 'event-title';
-            titleElement.textContent = item.title;
-            eventElement.appendChild(titleElement);
-            
-            // 説明（ホバー時のみ表示）
-            if (item.description) {
-                const descElement = document.createElement('div');
-                descElement.className = 'event-description';
-                descElement.textContent = item.description;
-                eventElement.appendChild(descElement);
+            const year = item.year;
+            if (!eventsByYear[year]) {
+                eventsByYear[year] = [];
             }
+            eventsByYear[year].push(item);
+        });
+
+        // 年ごとにイベントを処理
+        Object.keys(eventsByYear).sort((a, b) => a - b).forEach(year => {
+            const events = eventsByYear[year];
+            const position = (year - START_YEAR) * PIXELS_PER_YEAR;
             
-            timelineContainer.appendChild(eventElement);
+            if (events.length === 1) {
+                // 単一イベントの場合は通常通り表示
+                const item = events[0];
+                const eventElement = document.createElement('div');
+                eventElement.className = 'event-item';
+                eventElement.setAttribute('data-category', item.category);
+                
+                eventElement.style.left = position + 'px';
+                eventElement.style.width = PIXELS_PER_YEAR + 'px';
+                
+                // イベント種類
+                const typeElement = document.createElement('div');
+                typeElement.className = `event-type event-${item.category}`;
+                typeElement.textContent = getCategoryLabel(item.category);
+                eventElement.appendChild(typeElement);
+                
+                // タイトル
+                const titleElement = document.createElement('div');
+                titleElement.className = 'event-title';
+                titleElement.textContent = item.title;
+                eventElement.appendChild(titleElement);
+                
+                // 説明（ホバー時のみ表示）
+                if (item.description) {
+                    const descElement = document.createElement('div');
+                    descElement.className = 'event-description';
+                    descElement.textContent = item.description;
+                    eventElement.appendChild(descElement);
+                }
+                
+                timelineContainer.appendChild(eventElement);
+            } else {
+                // 複数イベントの場合はアコーディオン表示
+                const groupElement = document.createElement('div');
+                groupElement.className = 'event-group';
+                groupElement.style.left = position + 'px';
+                
+                // ヘッダー（件数を表示）
+                const headerElement = document.createElement('div');
+                headerElement.className = 'event-group-header';
+                headerElement.innerHTML = `<span class="event-count">${events.length}件のイベント</span>`;
+                
+                // コンテンツ（初期状態では非表示）
+                const contentElement = document.createElement('div');
+                contentElement.className = 'event-group-content';
+                
+                // 各イベントをコンテンツに追加
+                events.forEach(item => {
+                    const eventItem = document.createElement('div');
+                    eventItem.className = 'event-group-item';
+                    
+                    // イベント種類
+                    const typeElement = document.createElement('div');
+                    typeElement.className = `event-type event-${item.category}`;
+                    typeElement.textContent = getCategoryLabel(item.category);
+                    eventItem.appendChild(typeElement);
+                    
+                    // タイトル
+                    const titleElement = document.createElement('div');
+                    titleElement.className = 'event-title';
+                    titleElement.textContent = item.title;
+                    eventItem.appendChild(titleElement);
+                    
+                    // 説明
+                    if (item.description) {
+                        const descElement = document.createElement('div');
+                        descElement.className = 'event-description';
+                        descElement.textContent = item.description;
+                        descElement.style.display = 'block'; // アコーディオン内では常に表示
+                        eventItem.appendChild(descElement);
+                    }
+                    
+                    contentElement.appendChild(eventItem);
+                });
+                
+                groupElement.appendChild(headerElement);
+                groupElement.appendChild(contentElement);
+                
+                // クリックで展開/折りたたみ
+                headerElement.addEventListener('click', () => {
+                    groupElement.classList.toggle('expanded');
+                });
+                
+                timelineContainer.appendChild(groupElement);
+            }
         });
         
         personRow.appendChild(timelineContainer);
