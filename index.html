@@ -235,16 +235,13 @@
         <button id="zoom-in">+</button>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script>
-        // ===== Google Sheets API設定 =====
-        const API_KEY = 'AIzaSyBNzrGaQUMoIl4YSLskuOg_kzqj3yQvQ0I';
-        const SPREADSHEET_ID = '1zIfX0H3ZqknFKUxD_qawGpgrQWRyMSo_nSz4vZJ9pKc';
-        const SHEET_RANGE = 'Sheet1!A1:E1000'; // 取得するセル範囲
+        // CSV として公開されたスプレッドシートの URL
+        // あなたのスプレッドシートのCSV公開URLに置き換えてください
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pub?output=csv';
         
-        // APIからデータを取得するURL
-        const SHEETS_API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
-        
-        // サンプルデータ（APIが失敗した場合のフォールバック）
+        // サンプルデータ（CSVの取得に失敗した場合のフォールバック）
         const SAMPLE_DATA = [
             {"year": 1867, "category": "birth", "architect": "フランク・ロイド・ライト", "title": "フランク・ロイド・ライト誕生", "description": "アメリカ合衆国ウィスコンシン州で生まれる"},
             {"year": 1887, "category": "building", "architect": "フランク・ロイド・ライト", "title": "ユニティ・テンプル", "description": "シカゴ郊外オークパークに建設された初期の代表作"},
@@ -278,44 +275,64 @@
         // ズーム関連
         let zoomLevel = 1;
         
-        // Google Sheets APIからデータを読み込む
+        // CSVデータを読み込む
         async function loadData() {
             try {
-                const response = await fetch(SHEETS_API_URL);
-                const result = await response.json();
+                const response = await fetch(CSV_URL);
                 
-                if (!result.values || result.values.length === 0) {
-                    throw new Error('データが空です');
+                if (!response.ok) {
+                    throw new Error(`HTTPエラー: ${response.status}`);
                 }
                 
-                // ヘッダー行を取得
-                const headers = result.values[0];
+                const csvText = await response.text();
                 
-                // データを整形
-                const data = [];
-                for (let i = 1; i < result.values.length; i++) {
-                    const row = result.values[i];
-                    if (row.length === 0) continue; // 空行をスキップ
-                    
-                    const record = {};
-                    for (let j = 0; j < headers.length; j++) {
-                        // 数値に変換可能な場合は数値に
-                        const value = row[j] || '';
-                        // yearは必ず数値に変換
-                        if (headers[j] === 'year') {
-                            record[headers[j]] = Number(value);
-                        } else {
-                            record[headers[j]] = isNaN(value) ? value : Number(value);
+                if (!csvText || csvText.trim() === '') {
+                    throw new Error('CSVデータが空です');
+                }
+                
+                // デバッグ情報
+                console.log('CSVデータ取得成功 (先頭部分):', csvText.substring(0, 200));
+                
+                // Papa Parse を使って CSV をパース
+                Papa.parse(csvText, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        console.log('CSVパース結果:', results);
+                        
+                        if (!results.data || results.data.length === 0) {
+                            throw new Error('パースしたデータが空です');
                         }
+                        
+                        // パースしたデータを処理
+                        processData(results.data);
+                    },
+                    error: function(error) {
+                        console.error('CSVのパースに失敗しました:', error);
+                        // エラー時はサンプルデータを使用
+                        processData(SAMPLE_DATA);
                     }
-                    
-                    data.push(record);
-                }
-                
-                // データを処理
-                processData(data);
+                });
             } catch (error) {
-                console.error('Google Sheets APIからのデータ取得に失敗しました:', error);
+                console.error('データの取得に失敗しました:', error);
+                
+                // エラーの詳細情報を表示（デバッグ用）
+                const errorDetails = document.createElement('div');
+                errorDetails.style.color = 'red';
+                errorDetails.style.padding = '1rem';
+                errorDetails.style.backgroundColor = '#fff8f8';
+                errorDetails.style.borderRadius = '4px';
+                errorDetails.style.marginBottom = '1rem';
+                errorDetails.innerHTML = `
+                    <h3>データ取得エラー</h3>
+                    <p>エラーメッセージ: ${error.message}</p>
+                    <p>CSV URL: ${CSV_URL}</p>
+                    <p>注: サンプルデータを使用して表示します</p>
+                `;
+                document.getElementById('timeline').innerHTML = '';
+                document.getElementById('timeline').appendChild(errorDetails);
+                
                 // エラー時はサンプルデータを使用
                 processData(SAMPLE_DATA);
             }
@@ -330,6 +347,11 @@
             // 建築家の生没年情報を取得
             data.forEach(item => {
                 if (!item.architect || !item.year) return;
+                
+                // yearが文字列の場合は数値に変換
+                if (typeof item.year === 'string') {
+                    item.year = parseInt(item.year);
+                }
                 
                 if (!architects[item.architect]) {
                     architects[item.architect] = [];
