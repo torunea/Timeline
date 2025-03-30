@@ -138,7 +138,6 @@ h1 {
 
 .person-lifespan {
     position: absolute;
-    margin-left: -50px; /* 微妙に合わないので50pxズラして調整 */
     top: 0;
     height: 40px;
     border-radius: 4px;
