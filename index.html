@@ -68,7 +68,33 @@ h1 {
 .container {
     margin-top: 140px;
     padding: 1rem;
-    overflow-x: auto;
+    display: flex; /* Flexbox を使用して並べる */
+    overflow: hidden; /* 全体のオーバーフローを隠す */
+}
+
+.architect-list {
+    width: 150px;
+    flex-shrink: 0; /* 幅を固定 */
+    border-right: 1px solid #333;
+    padding-right: 1rem;
+    padding-top: 3rem; /* 年表ヘッダーの高さに合わせる */
+}
+
+.architect-item {
+    text-align: right;
+    font-weight: 300;
+    font-size: 0.9rem;
+    color: #b0b0b0;
+    margin-bottom: 60px; /* 建築家行の高さに合わせる */
+    height: 80px; /* 建築家行の高さに合わせる */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.timeline-scroll {
+    overflow-x: auto; /* この部分だけ横スクロール可能 */
+    flex-grow: 1;
 }
 
 .timeline {
@@ -80,6 +106,10 @@ h1 {
     display: flex;
     border-bottom: 1px solid #333;
     margin-bottom: 1rem;
+    position: sticky;
+    top: 0; /* ヘッダーを上部に固定 */
+    background-color: #121212;
+    z-index: 50;
 }
 
 .year-marker {
@@ -113,7 +143,6 @@ h1 {
 .architect-lifespan {
     position: absolute;
     top: 0;
-    left: 150px;
     height: 40px;
     background-color: rgba(255, 165, 0, 0.15); /* オレンジ色をダークテーマに合わせて調整 */
     border: 1px solid rgba(255, 165, 0, 0.3); /* オレンジ系の枠線 */
@@ -247,8 +276,13 @@ h1 {
 </div>
 
 <div class="container">
-<div id="timeline" class="timeline">
-    <div class="loading">データを読み込んでいます...</div>
+<div class="architect-list" id="architect-list">
+    <!-- 建築家名リストがここに入ります -->
+</div>
+<div class="timeline-scroll">
+    <div id="timeline" class="timeline">
+        <div class="loading">データを読み込んでいます...</div>
+    </div>
 </div>
 </div>
 
@@ -287,7 +321,7 @@ const SAMPLE_DATA = [
 const START_YEAR = 1950;
 const END_YEAR = 2025;
 const YEARS_PER_MARKER = 1;
-const PIXELS_PER_YEAR = 100; // 年ごとの幅を広く設定
+const PIXELS_PER_YEAR = 200; // 年ごとの幅を広く設定
 
 // ズーム関連
 let zoomLevel = 1;
@@ -402,17 +436,14 @@ function processData(data) {
 // 年表の描画
 function renderTimeline(architects, birthDeathInfo) {
     const timelineElement = document.getElementById('timeline');
+    const architectListElement = document.getElementById('architect-list');
+    
     timelineElement.innerHTML = '';
+    architectListElement.innerHTML = '';
     
     // 年マーカーのヘッダーを作成
     const timelineHeader = document.createElement('div');
     timelineHeader.className = 'timeline-header';
-    
-    // マーカーの前に空白を追加（建築家名の列のため）
-    const emptyMarker = document.createElement('div');
-    emptyMarker.style.width = '150px';
-    emptyMarker.style.flexShrink = '0';
-    timelineHeader.appendChild(emptyMarker);
     
     // 年マーカーを作成
     for (let year = START_YEAR; year <= END_YEAR; year += YEARS_PER_MARKER) {
@@ -430,15 +461,16 @@ function renderTimeline(architects, birthDeathInfo) {
         const items = architects[architectName];
         const bdInfo = birthDeathInfo[architectName] || {};
         
+        // 建築家リストに名前を追加
+        const nameItem = document.createElement('div');
+        nameItem.className = 'architect-item';
+        nameItem.textContent = architectName;
+        architectListElement.appendChild(nameItem);
+        
+        // 建築家のタイムライン行
         const architectRow = document.createElement('div');
         architectRow.className = 'architect-row';
         architectRow.setAttribute('data-architect', architectName);
-        
-        // 建築家名
-        const nameElement = document.createElement('div');
-        nameElement.className = 'architect-name';
-        nameElement.textContent = architectName;
-        architectRow.appendChild(nameElement);
         
         // 建築家のタイムライン
         const timelineContainer = document.createElement('div');
@@ -457,7 +489,7 @@ function renderTimeline(architects, birthDeathInfo) {
             const endPosition = Math.min((END_YEAR - START_YEAR) * PIXELS_PER_YEAR, (deathYear - START_YEAR) * PIXELS_PER_YEAR);
             const width = endPosition - startPosition;
             
-            lifespanElement.style.left = (150 + startPosition) + 'px';
+            lifespanElement.style.left = startPosition + 'px';
             lifespanElement.style.width = width + 'px';
             
             timelineContainer.appendChild(lifespanElement);
