@@ -112,13 +112,12 @@
         .architect-timeline {
             position: relative;
             margin-left: 150px;
-            padding-top: 50px;
             min-height: 100px;
         }
         
         .event-item {
             position: absolute;
-            top: 50px;
+            top: 0; /* 帯の上に表示するように変更 */
             width: 90px;
             background-color: #fff;
             border: 1px solid #ddd;
@@ -127,6 +126,7 @@
             font-size: 0.8rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 10;
+            cursor: pointer; /* ホバー時のカーソルを変更 */
         }
         
         .event-item:hover {
@@ -160,6 +160,21 @@
         .event-title {
             font-weight: bold;
             margin-bottom: 3px;
+        }
+        
+        /* 説明文を最初は非表示に */
+        .event-description {
+            display: none;
+            padding-top: 5px;
+            font-size: 0.75rem;
+            color: #666;
+            border-top: 1px dotted #ddd;
+            margin-top: 5px;
+        }
+        
+        /* ホバー時に説明文を表示 */
+        .event-item:hover .event-description {
+            display: block;
         }
         
         .loading {
@@ -270,7 +285,7 @@
         const START_YEAR = 1950;
         const END_YEAR = 2025;
         const YEARS_PER_MARKER = 1;
-        const PIXELS_PER_YEAR = 40;
+        const PIXELS_PER_YEAR = 50;
         
         // ズーム関連
         let zoomLevel = 1;
@@ -423,6 +438,10 @@
                 nameElement.textContent = architectName;
                 architectRow.appendChild(nameElement);
                 
+                // 建築家のタイムライン
+                const timelineContainer = document.createElement('div');
+                timelineContainer.className = 'architect-timeline';
+                
                 // 生存期間の帯を表示
                 if (bdInfo.birth && bdInfo.death) {
                     const lifespanElement = document.createElement('div');
@@ -436,12 +455,8 @@
                     lifespanElement.style.left = (150 + startPosition) + 'px';
                     lifespanElement.style.width = width + 'px';
                     
-                    architectRow.appendChild(lifespanElement);
+                    timelineContainer.appendChild(lifespanElement);
                 }
-                
-                // 建築家のタイムライン
-                const timelineContainer = document.createElement('div');
-                timelineContainer.className = 'architect-timeline';
                 
                 // イベントを表示
                 items.forEach(item => {
@@ -468,7 +483,7 @@
                     titleElement.textContent = item.title;
                     eventElement.appendChild(titleElement);
                     
-                    // 説明
+                    // 説明（ホバー時のみ表示）
                     if (item.description) {
                         const descElement = document.createElement('div');
                         descElement.className = 'event-description';
