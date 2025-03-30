@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建築家年表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .filter-controls {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .search-box {
+            padding: 0.5rem;
+            width: 250px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .category-filter select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+        }
+        
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: #333;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+        }
+        
+        .year-container {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+        }
+        
+        .year-container.left {
+            left: 0;
+        }
+        
+        .year-container.right {
+            left: 50%;
+        }
+        
+        .year-container::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border: 4px solid #FF9F55;
+            border-radius: 50%;
+            top: 15px;
+            right: -13px;
+            z-index: 1;
+        }
+        
+        .year-container.right::after {
+            left: -13px;
+        }
+        
+        .year-content {
+            padding: 20px 30px;
+            background-color: white;
+            position: relative;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .year {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #FF9F55;
+        }
+        
+        .timeline-item {
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .timeline-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .timeline-category {
+            display: inline-block;
+            padding: 2px 8px;
+            margin-right: 5px;
+            font-size: 0.8rem;
+            border-radius: 3px;
+        }
+        
+        .category-birth {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+        }
+        
+        .category-death {
+            background-color: #fce4ec;
+            color: #880e4f;
+        }
+        
+        .category-building {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+        }
+        
+        .category-publication {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+        
+        .category-essay {
+            background-color: #f3e5f5;
+            color: #4a148c;
+        }
+        
+        .timeline-item-title {
+            font-weight: 500;
+        }
+        
+        .timeline-item-architect {
+            font-style: italic;
+            color: #666;
+        }
+        
+        .timeline-item-description {
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: #333;
+            color: white;
+            margin-top: 3rem;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .year-container {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .year-container.right {
+                left: 0;
+            }
+            
+            .year-container.left::after, .year-container.right::after {
+                left: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>建築家年表</h1>
+    </header>
+    
+    <div class="container">
+        <div class="filter-controls">
+            <div class="search">
+                <input type="text" id="search-box" class="search-box" placeholder="建築家名、プロジェクト名で検索...">
+            </div>
+            <div class="category-filter">
+                <select id="category-select">
+                    <option value="all">すべてのカテゴリ</option>
+                    <option value="birth">生年</option>
+                    <option value="death">没年</option>
+                    <option value="building">建築作品</option>
+                    <option value="publication">出版物</option>
+                    <option value="essay">論考</option>
+                </select>
+            </div>
+        </div>
+        
+        <div id="timeline" class="timeline">
+            <div class="loading">データを読み込んでいます...</div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2025 建築家年表 - スプレッドシートデータを使用</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script>
+        // 公開されたスプレッドシートのURL
+        const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pubhtml';
+        
+        // データの読み込み
+        async function loadData() {
+            try {
+                // Google Sheets APIを使用してデータを取得
+                // 公開スプレッドシートのIDを抽出
+                const pubId = SPREADSHEET_URL.match(/\/e\/(.+?)\/pubhtml/)[1];
+                
+                // 公開スプレッドシートのCSVエクスポートURL
+                const csvUrl = `https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pub?output=csv`;
+                
+                const response = await fetch(csvUrl);
+                const csvData = await response.text();
+                
+                // CSVデータをパース
+                Papa.parse(csvData, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        // 読み込んだデータを年順にソート
+                        const sortedData = results.data.sort((a, b) => a.year - b.year);
+                        
+                        // 年表を表示
+                        displayTimeline(sortedData);
+                        
+                        // 検索とフィルタ機能を設定
+                        setupFilters(sortedData);
+                    },
+                    error: function(error) {
+                        console.error('データの読み込みに失敗しました:', error);
+                        document.getElementById('timeline').innerHTML = `
+                            <div class="loading" style="color: red;">
+                                データの読み込みに失敗しました。スプレッドシートが公開されていることを確認してください。
+                            </div>
+                        `;
+                    }
+                });
+            } catch (error) {
+                console.error('データの取得に失敗しました:', error);
+                document.getElementById('timeline').innerHTML = `
+                    <div class="loading" style="color: red;">
+                        データの取得に失敗しました。スプレッドシートの形式または接続を確認してください。
+                        エラー: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // 年表の表示
+        function displayTimeline(data) {
+            const timelineElement = document.getElementById('timeline');
+            timelineElement.innerHTML = '';
+            
+            // 年ごとにグループ化
+            const groupedByYear = data.reduce((acc, item) => {
+                if (!acc[item.year]) {
+                    acc[item.year] = [];
+                }
+                acc[item.year].push(item);
+                return acc;
+            }, {});
+            
+            // 各年のコンテナを作成
+            let isLeft = true;
+            Object.keys(groupedByYear).sort((a, b) => a - b).forEach(year => {
+                const yearItems = groupedByYear[year];
+                
+                const yearContainer = document.createElement('div');
+                yearContainer.className = `year-container ${isLeft ? 'left' : 'right'}`;
+                
+                const yearContent = document.createElement('div');
+                yearContent.className = 'year-content';
+                
+                const yearHeader = document.createElement('div');
+                yearHeader.className = 'year';
+                yearHeader.textContent = year;
+                yearContent.appendChild(yearHeader);
+                
+                // その年のイベントを追加
+                yearItems.forEach(item => {
+                    const timelineItem = document.createElement('div');
+                    timelineItem.className = 'timeline-item';
+                    timelineItem.setAttribute('data-category', item.category);
+                    timelineItem.setAttribute('data-architect', item.architect);
+                    timelineItem.setAttribute('data-title', item.title);
+                    
+                    // カテゴリラベル
+                    const categorySpan = document.createElement('span');
+                    categorySpan.className = `timeline-category category-${item.category}`;
+                    categorySpan.textContent = getCategoryLabel(item.category);
+                    timelineItem.appendChild(categorySpan);
+                    
+                    // タイトル
+                    const titleSpan = document.createElement('span');
+                    titleSpan.className = 'timeline-item-title';
+                    titleSpan.textContent = item.title;
+                    timelineItem.appendChild(titleSpan);
+                    
+                    // 建築家名
+                    if (item.architect) {
+                        const architectSpan = document.createElement('span');
+                        architectSpan.className = 'timeline-item-architect';
+                        architectSpan.textContent = ` - ${item.architect}`;
+                        timelineItem.appendChild(architectSpan);
+                    }
+                    
+                    // 説明文があれば追加
+                    if (item.description) {
+                        const descriptionDiv = document.createElement('div');
+                        descriptionDiv.className = 'timeline-item-description';
+                        descriptionDiv.textContent = item.description;
+                        timelineItem.appendChild(descriptionDiv);
+                    }
+                    
+                    yearContent.appendChild(timelineItem);
+                });
+                
+                yearContainer.appendChild(yearContent);
+                timelineElement.appendChild(yearContainer);
+                
+                // 左右交互に配置
+                isLeft = !isLeft;
+            });
+        }
+        
+        // カテゴリのラベルを取得
+        function getCategoryLabel(category) {
+            const labels = {
+                'birth': '誕生',
+                'death': '没',
+                'building': '建築作品',
+                'publication': '出版',
+                'essay': '論考'
+            };
+            return labels[category] || category;
+        }
+        
+        // 検索とフィルタ機能の設定
+        function setupFilters(data) {
+            const searchBox = document.getElementById('search-box');
+            const categorySelect = document.getElementById('category-select');
+            
+            // 検索機能
+            searchBox.addEventListener('input', () => {
+                filterTimeline(data, searchBox.value, categorySelect.value);
+            });
+            
+            // カテゴリフィルタ
+            categorySelect.addEventListener('change', () => {
+                filterTimeline(data, searchBox.value, categorySelect.value);
+            });
+        }
+        
+        // 年表のフィルタリング
+        function filterTimeline(data, searchTerm, category) {
+            searchTerm = searchTerm.toLowerCase();
+            
+            // フィルタされたデータを取得
+            let filteredData = data;
+            
+            if (searchTerm) {
+                filteredData = filteredData.filter(item => 
+                    (item.architect && item.architect.toLowerCase().includes(searchTerm)) ||
+                    (item.title && item.title.toLowerCase().includes(searchTerm)) ||
+                    (item.description && item.description.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            if (category && category !== 'all') {
+                filteredData = filteredData.filter(item => item.category === category);
+            }
+            
+            // フィルタされたデータで年表を再表示
+            displayTimeline(filteredData);
+        }
+        
+        // ページ読み込み時にデータを取得
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
