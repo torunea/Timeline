@@ -5,7 +5,7 @@
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pub?output=csv';
 
 // 年表の設定
-const START_YEAR = 1850;
+const START_YEAR = 1950;
 const END_YEAR = 2025;
 const YEARS_PER_MARKER = 1;
 const PIXELS_PER_YEAR = 200; // .year-markerの幅と一致させる
