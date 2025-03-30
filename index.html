@@ -235,10 +235,39 @@
         <button id="zoom-in">+</button>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script>
-        // 公開されたスプレッドシートのURL
-        const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pubhtml';
+        // ===== Google Sheets API設定 =====
+        const API_KEY = 'AIzaSyBNzrGaQUMoIl4YSLskuOg_kzqj3yQvQ0I';
+        const SPREADSHEET_ID = '1zIfX0H3ZqknFKUxD_qawGpgrQWRyMSo_nSz4vZJ9pKc';
+        const SHEET_RANGE = 'Sheet1!A1:E1000'; // 取得するセル範囲
+        
+        // APIからデータを取得するURL
+        const SHEETS_API_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_RANGE}?key=${API_KEY}`;
+        
+        // サンプルデータ（APIが失敗した場合のフォールバック）
+        const SAMPLE_DATA = [
+            {"year": 1867, "category": "birth", "architect": "フランク・ロイド・ライト", "title": "フランク・ロイド・ライト誕生", "description": "アメリカ合衆国ウィスコンシン州で生まれる"},
+            {"year": 1887, "category": "building", "architect": "フランク・ロイド・ライト", "title": "ユニティ・テンプル", "description": "シカゴ郊外オークパークに建設された初期の代表作"},
+            {"year": 1910, "category": "publication", "architect": "フランク・ロイド・ライト", "title": "オーガニック・アーキテクチャ", "description": "建築の原理に関する著書"},
+            {"year": 1916, "category": "building", "architect": "フランク・ロイド・ライト", "title": "帝国ホテル", "description": "東京に建設され、関東大震災にも耐えたホテル建築"},
+            {"year": 1936, "category": "building", "architect": "フランク・ロイド・ライト", "title": "落水荘（カウフマン邸）", "description": "ペンシルバニア州の滝の上に建つ名作住宅"},
+            {"year": 1959, "category": "death", "architect": "フランク・ロイド・ライト", "title": "フランク・ロイド・ライト死去", "description": "91歳でアリゾナ州フェニックスにて死去"},
+            {"year": 1887, "category": "birth", "architect": "ル・コルビュジエ", "title": "ル・コルビュジエ誕生", "description": "スイスのラ・ショー・ド・フォンで生まれる"},
+            {"year": 1923, "category": "publication", "architect": "ル・コルビュジエ", "title": "建築をめざして", "description": "モダニズム建築の原則を示した著作"},
+            {"year": 1928, "category": "building", "architect": "ル・コルビュジエ", "title": "サヴォア邸", "description": "パリ郊外ポワシーに建つモダニズム住宅の傑作"},
+            {"year": 1952, "category": "building", "architect": "ル・コルビュジエ", "title": "ロンシャン礼拝堂", "description": "フランスのロンシャンに建つ曲線的な形態の教会"},
+            {"year": 1965, "category": "death", "architect": "ル・コルビュジエ", "title": "ル・コルビュジエ死去", "description": "フランス・コートダジュールの海で水浴中に死去"},
+            {"year": 1883, "category": "birth", "architect": "ミース・ファン・デル・ローエ", "title": "ミース・ファン・デル・ローエ誕生", "description": "ドイツのアーヘンで生まれる"},
+            {"year": 1929, "category": "building", "architect": "ミース・ファン・デル・ローエ", "title": "バルセロナ・パビリオン", "description": "バルセロナ万博のドイツ館として建設"},
+            {"year": 1951, "category": "essay", "architect": "ミース・ファン・デル・ローエ", "title": "少ないことは豊かなこと", "description": "ミニマリズムの建築思想を語った論考"},
+            {"year": 1956, "category": "building", "architect": "ミース・ファン・デル・ローエ", "title": "シーグラム・ビル", "description": "ニューヨークに建つガラスのオフィスビル"},
+            {"year": 1969, "category": "death", "architect": "ミース・ファン・デル・ローエ", "title": "ミース・ファン・デル・ローエ死去", "description": "シカゴにて83歳で死去"},
+            {"year": 1901, "category": "birth", "architect": "安藤忠雄", "title": "安藤忠雄誕生", "description": "大阪に生まれる"},
+            {"year": 1976, "category": "building", "architect": "安藤忠雄", "title": "住吉の長屋", "description": "大阪市住吉区の住宅作品"},
+            {"year": 1989, "category": "building", "architect": "安藤忠雄", "title": "光の教会", "description": "大阪府茨木市の宗教建築"},
+            {"year": 1995, "category": "publication", "architect": "安藤忠雄", "title": "建築を語る", "description": "建築思想についての著書"},
+            {"year": 2013, "category": "building", "architect": "安藤忠雄", "title": "地中美術館", "description": "直島の美術館建築"}
+        ];
         
         // 年表の設定
         const START_YEAR = 1950;
@@ -249,45 +278,46 @@
         // ズーム関連
         let zoomLevel = 1;
         
-        // データの読み込み
+        // Google Sheets APIからデータを読み込む
         async function loadData() {
             try {
-                // Google Sheets APIを使用してデータを取得
-                // 公開スプレッドシートのIDを抽出
-                const pubId = SPREADSHEET_URL.match(/\/e\/(.+?)\/pubhtml/)[1];
+                const response = await fetch(SHEETS_API_URL);
+                const result = await response.json();
                 
-                // 公開スプレッドシートのCSVエクスポートURL
-                const csvUrl = `https://docs.google.com/spreadsheets/d/e/${pubId}/pub?output=csv`;
+                if (!result.values || result.values.length === 0) {
+                    throw new Error('データが空です');
+                }
                 
-                const response = await fetch(CSV_URL);
-                const csvData = await response.text();
+                // ヘッダー行を取得
+                const headers = result.values[0];
                 
-                // CSVデータをパース
-                Papa.parse(csvData, {
-                    header: true,
-                    dynamicTyping: true,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        // データを処理して年表を表示
-                        processData(results.data);
-                    },
-                    error: function(error) {
-                        console.error('データの読み込みに失敗しました:', error);
-                        document.getElementById('timeline').innerHTML = `
-                            <div class="loading" style="color: red;">
-                                データの読み込みに失敗しました。スプレッドシートが公開されていることを確認してください。
-                            </div>
-                        `;
+                // データを整形
+                const data = [];
+                for (let i = 1; i < result.values.length; i++) {
+                    const row = result.values[i];
+                    if (row.length === 0) continue; // 空行をスキップ
+                    
+                    const record = {};
+                    for (let j = 0; j < headers.length; j++) {
+                        // 数値に変換可能な場合は数値に
+                        const value = row[j] || '';
+                        // yearは必ず数値に変換
+                        if (headers[j] === 'year') {
+                            record[headers[j]] = Number(value);
+                        } else {
+                            record[headers[j]] = isNaN(value) ? value : Number(value);
+                        }
                     }
-                });
+                    
+                    data.push(record);
+                }
+                
+                // データを処理
+                processData(data);
             } catch (error) {
-                console.error('データの取得に失敗しました:', error);
-                document.getElementById('timeline').innerHTML = `
-                    <div class="loading" style="color: red;">
-                        データの取得に失敗しました。スプレッドシートの形式または接続を確認してください。
-                        エラー: ${error.message}
-                    </div>
-                `;
+                console.error('Google Sheets APIからのデータ取得に失敗しました:', error);
+                // エラー時はサンプルデータを使用
+                processData(SAMPLE_DATA);
             }
         }
         
