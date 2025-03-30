@@ -273,7 +273,7 @@
         const START_YEAR = 1950;
         const END_YEAR = 2025;
         const YEARS_PER_MARKER = 1;
-        const PIXELS_PER_YEAR = 100; // 年ごとの幅を2倍に拡大
+        const PIXELS_PER_YEAR = 200; // 年ごとの幅を広く設定
         
         // ズーム関連
         let zoomLevel = 1;
@@ -458,9 +458,11 @@
                     eventElement.className = 'event-item';
                     eventElement.setAttribute('data-category', item.category);
                     
+                    // イベント種類とタイトルを表示するために、幅に合わせてサイズ調整
                     // 位置を計算
                     const position = (item.year - START_YEAR) * PIXELS_PER_YEAR;
                     eventElement.style.left = position + 'px';
+                    eventElement.style.width = PIXELS_PER_YEAR + 'px';
                     
                     // イベント種類
                     const typeElement = document.createElement('div');
