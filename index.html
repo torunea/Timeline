@@ -185,14 +185,7 @@
         }
         
         .zoom-controls {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            z-index: 100;
-            background-color: white;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            padding: 0.5rem;
+            display: none; /* ズームコントロールを非表示に */
         }
         
         .zoom-controls button {
@@ -242,12 +235,6 @@
         <div id="timeline" class="timeline">
             <div class="loading">データを読み込んでいます...</div>
         </div>
-    </div>
-    
-    <div class="zoom-controls">
-        <button id="zoom-out">-</button>
-        <button id="zoom-reset">リセット</button>
-        <button id="zoom-in">+</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
@@ -442,14 +429,17 @@
                 const timelineContainer = document.createElement('div');
                 timelineContainer.className = 'architect-timeline';
                 
-                // 生存期間の帯を表示
-                if (bdInfo.birth && bdInfo.death) {
+                // 生存期間の帯を表示（birth/deathがない場合は表示期間の開始/終了を使用）
+                const birthYear = bdInfo.birth || START_YEAR; // birthがなければ開始年
+                const deathYear = bdInfo.death || END_YEAR; // deathがなければ終了年まで
+                
+                if (birthYear && deathYear) {
                     const lifespanElement = document.createElement('div');
                     lifespanElement.className = 'architect-lifespan';
                     
                     // 位置を計算
-                    const startPosition = Math.max(0, (bdInfo.birth - START_YEAR) * PIXELS_PER_YEAR);
-                    const endPosition = Math.min((END_YEAR - START_YEAR) * PIXELS_PER_YEAR, (bdInfo.death - START_YEAR) * PIXELS_PER_YEAR);
+                    const startPosition = Math.max(0, (birthYear - START_YEAR) * PIXELS_PER_YEAR);
+                    const endPosition = Math.min((END_YEAR - START_YEAR) * PIXELS_PER_YEAR, (deathYear - START_YEAR) * PIXELS_PER_YEAR);
                     const width = endPosition - startPosition;
                     
                     lifespanElement.style.left = (150 + startPosition) + 'px';
@@ -589,61 +579,8 @@
         
         // ズーム機能のセットアップ
         function setupZoom() {
-            const zoomInBtn = document.getElementById('zoom-in');
-            const zoomOutBtn = document.getElementById('zoom-out');
-            const zoomResetBtn = document.getElementById('zoom-reset');
-            const timeline = document.getElementById('timeline');
-            
-            zoomInBtn.addEventListener('click', () => {
-                if (zoomLevel < 2) {
-                    zoomLevel += 0.25;
-                    applyZoom();
-                }
-            });
-            
-            zoomOutBtn.addEventListener('click', () => {
-                if (zoomLevel > 0.5) {
-                    zoomLevel -= 0.25;
-                    applyZoom();
-                }
-            });
-            
-            zoomResetBtn.addEventListener('click', () => {
-                zoomLevel = 1;
-                applyZoom();
-            });
-            
-            // ズームを適用
-            function applyZoom() {
-                const yearMarkers = document.querySelectorAll('.year-marker');
-                yearMarkers.forEach(marker => {
-                    marker.style.width = (PIXELS_PER_YEAR * YEARS_PER_MARKER * zoomLevel) + 'px';
-                });
-                
-                const eventItems = document.querySelectorAll('.event-item');
-                eventItems.forEach(item => {
-                    const year = parseInt(item.style.left) / PIXELS_PER_YEAR + START_YEAR;
-                    const newPosition = (year - START_YEAR) * PIXELS_PER_YEAR * zoomLevel;
-                    item.style.left = newPosition + 'px';
-                });
-                
-                const lifespans = document.querySelectorAll('.architect-lifespan');
-                lifespans.forEach(span => {
-                    const left = parseInt(span.style.left.replace('px', ''));
-                    const width = parseInt(span.style.width.replace('px', ''));
-                    
-                    // 元の年を計算
-                    const startYear = (left - 150) / PIXELS_PER_YEAR + START_YEAR;
-                    const endYear = startYear + (width / PIXELS_PER_YEAR);
-                    
-                    // 新しい位置を計算
-                    const newStart = (startYear - START_YEAR) * PIXELS_PER_YEAR * zoomLevel;
-                    const newEnd = (endYear - START_YEAR) * PIXELS_PER_YEAR * zoomLevel;
-                    
-                    span.style.left = (150 + newStart) + 'px';
-                    span.style.width = (newEnd - newStart) + 'px';
-                });
-            }
+            // ズーム機能は削除されたため、この関数は空になります
+            // ここにあった機能は拡大縮小ボタンを非表示にしたため削除しました
         }
         
         // ページ読み込み時にデータを取得
