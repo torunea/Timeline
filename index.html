@@ -94,7 +94,8 @@
             width: 150px;
             text-align: right;
             padding-right: 1rem;
-            font-weight: bold;
+            font-weight: 300; /* フォントを細く */
+            font-size: 0.9rem; /* フォントを小さく */
             z-index: 5;
         }
         
@@ -103,8 +104,8 @@
             top: 0;
             left: 150px;
             height: 40px;
-            background-color: rgba(0, 123, 255, 0.1);
-            border: 1px solid rgba(0, 123, 255, 0.3);
+            background-color: rgba(255, 165, 0, 0.2); /* オレンジ色に変更 */
+            border: 1px solid rgba(255, 165, 0, 0.4); /* オレンジ系の枠線 */
             border-radius: 4px;
             z-index: 1;
         }
@@ -118,7 +119,7 @@
         .event-item {
             position: absolute;
             top: 0; /* 帯の上に表示するように変更 */
-            width: 90px;
+            width: 180px; /* ボックスの幅を広く */
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -272,7 +273,7 @@
         const START_YEAR = 1950;
         const END_YEAR = 2025;
         const YEARS_PER_MARKER = 1;
-        const PIXELS_PER_YEAR = 50;
+        const PIXELS_PER_YEAR = 100; // 年ごとの幅を2倍に拡大
         
         // ズーム関連
         let zoomLevel = 1;
