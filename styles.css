@@ -1,0 +1,284 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+}
+
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+    overflow-x: hidden;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1a1a1a;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    z-index: 1000;
+}
+
+h1 {
+    font-weight: 400;
+    letter-spacing: 1px;
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+.controls {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background-color: #1a1a1a;
+    padding: 0.5rem 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    z-index: 999;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-box {
+    padding: 0.5rem;
+    width: 250px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+}
+
+#filter-select, #attribution-filter {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+}
+
+.container {
+    margin-top: 140px;
+    padding: 1rem;
+    display: flex;
+    overflow: hidden;
+}
+
+.person-list {
+    width: 150px;
+    flex-shrink: 0;
+    border-right: 1px solid #333;
+    padding-right: 1rem;
+    padding-top: 3rem;
+}
+
+.person-item {
+    text-align: right;
+    font-weight: 300;
+    font-size: 0.9rem;
+    color: #b0b0b0;
+    margin-bottom: 60px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.timeline-scroll {
+    overflow-x: auto;
+    flex-grow: 1;
+}
+
+.timeline {
+    position: relative;
+    min-width: 5000px;
+}
+
+.timeline-header {
+    display: flex;
+    border-bottom: 1px solid #333;
+    margin-bottom: 1rem;
+    position: sticky;
+    top: 0;
+    background-color: #121212;
+    z-index: 50;
+}
+
+.year-marker {
+    flex: 0 0 200px;
+    text-align: center;
+    font-weight: bold;
+    padding: 0.5rem 0;
+    border-right: 1px solid #333;
+    color: #b0b0b0;
+}
+
+.person-row {
+    position: relative;
+    margin-bottom: 1rem;
+    min-height: 80px;
+}
+
+.person-name {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 150px;
+    text-align: right;
+    padding-right: 1rem;
+    font-weight: 300;
+    font-size: 0.9rem;
+    z-index: 5;
+    color: #b0b0b0;
+}
+
+.person-lifespan {
+    position: absolute;
+    top: 0;
+    height: 40px;
+    border-radius: 4px;
+    z-index: 1;
+}
+
+/* 属性ごとの色設定 */
+.attribution-architect {
+    background-color: rgba(255, 165, 0, 0.15);
+    border: 1px solid rgba(255, 165, 0, 0.3);
+}
+
+.attribution-artist {
+    background-color: rgba(106, 90, 205, 0.15);
+    border: 1px solid rgba(106, 90, 205, 0.3);
+}
+
+.attribution-writer {
+    background-color: rgba(46, 139, 87, 0.15);
+    border: 1px solid rgba(46, 139, 87, 0.3);
+}
+
+.attribution-scientist {
+    background-color: rgba(70, 130, 180, 0.15);
+    border: 1px solid rgba(70, 130, 180, 0.3);
+}
+
+.attribution-philosopher {
+    background-color: rgba(178, 34, 34, 0.15);
+    border: 1px solid rgba(178, 34, 34, 0.3);
+}
+
+.attribution-politician {
+    background-color: rgba(184, 134, 11, 0.15);
+    border: 1px solid rgba(184, 134, 11, 0.3);
+}
+
+.attribution-musician {
+    background-color: rgba(186, 85, 211, 0.15);
+    border: 1px solid rgba(186, 85, 211, 0.3);
+}
+
+.attribution-default {
+    background-color: rgba(169, 169, 169, 0.15);
+    border: 1px solid rgba(169, 169, 169, 0.3);
+}
+
+.person-timeline {
+    position: relative;
+    margin-left: 150px;
+    min-height: 80px;
+}
+
+.event-item {
+    position: absolute;
+    top: 0;
+    width: 100px;
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 10;
+    cursor: pointer;
+    color: #e0e0e0;
+}
+
+.event-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    z-index: 11;
+    background-color: #333;
+}
+
+.event-type {
+    display: inline-block;
+    padding: 2px 5px;
+    font-size: 0.7rem;
+    border-radius: 3px;
+    margin-bottom: 3px;
+}
+
+.event-building {
+    background-color: #1b4e20;
+    color: #a5d6a7;
+}
+
+.event-publication {
+    background-color: #6d4c41;
+    color: #d7ccc8;
+}
+
+.event-essay {
+    background-color: #4a148c;
+    color: #ce93d8;
+}
+
+.event-artwork {
+    background-color: #283593;
+    color: #9fa8da;
+}
+
+.event-discovery {
+    background-color: #01579b;
+    color: #81d4fa;
+}
+
+.event-title {
+    font-weight: bold;
+    margin-bottom: 3px;
+    color: #ffffff;
+}
+
+/* 説明文を最初は非表示に */
+.event-description {
+    display: none;
+    padding-top: 5px;
+    font-size: 0.75rem;
+    color: #a0a0a0;
+    border-top: 1px dotted #444;
+    margin-top: 5px;
+}
+
+/* ホバー時に説明文を表示 */
+.event-item:hover .event-description {
+    display: block;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #a0a0a0;
+}
+
+@media (max-width: 768px) {
+    .person-name {
+        width: 100px;
+    }
+    
+    .person-timeline {
+        margin-left: 100px;
+    }
+}
