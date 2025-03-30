@@ -1,591 +1,607 @@
-<!DOCTYPE html>
+#filter-select {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    padding: 0.5rem;
+    border-radius: 4px;
+}<!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>建築家年表</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-        }
-        
-        body {
-            background-color: #f8f9fa;
-            color: #212529;
-            overflow-x: hidden;
-        }
-        
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #fff;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 1000;
-        }
-        
-        h1 {
-            font-weight: 400;
-            letter-spacing: 1px;
-            font-size: 1.5rem;
-        }
-        
-        .controls {
-            position: fixed;
-            top: 70px;
-            left: 0;
-            width: 100%;
-            background-color: #fff;
-            padding: 0.5rem 2rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 999;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .search-box {
-            padding: 0.5rem;
-            width: 250px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .container {
-            margin-top: 140px;
-            padding: 1rem;
-            overflow-x: auto;
-        }
-        
-        .timeline {
-            position: relative;
-            min-width: 5000px; /* 横スクロールのため十分な幅を確保 */
-        }
-        
-        .timeline-header {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 1rem;
-        }
-        
-        .year-marker {
-            flex: 0 0 100px; /* 5年ごとに100px幅 */
-            text-align: center;
-            font-weight: bold;
-            padding: 0.5rem 0;
-            border-right: 1px solid #eee;
-        }
-        
-        .architect-row {
-            position: relative;
-            margin-bottom: 2rem;
-            min-height: 100px;
-        }
-        
-        .architect-name {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 150px;
-            text-align: right;
-            padding-right: 1rem;
-            font-weight: 300; /* フォントを細く */
-            font-size: 0.9rem; /* フォントを小さく */
-            z-index: 5;
-        }
-        
-        .architect-lifespan {
-            position: absolute;
-            top: 0;
-            left: 150px;
-            height: 40px;
-            background-color: rgba(255, 165, 0, 0.2); /* オレンジ色に変更 */
-            border: 1px solid rgba(255, 165, 0, 0.4); /* オレンジ系の枠線 */
-            border-radius: 4px;
-            z-index: 1;
-        }
-        
-        .architect-timeline {
-            position: relative;
-            margin-left: 150px;
-            min-height: 100px;
-            padding-left: 2px; /* 建築家名の背景とのギャップを作成 */
-        }
-        
-        /* シャドウ効果を削除 */
-        
-        .event-item {
-            position: absolute;
-            top: 0; /* 帯の上に表示するように変更 */
-            width: 180px; /* ボックスの幅を広く */
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 0.5rem;
-            font-size: 0.8rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 10;
-            cursor: pointer; /* ホバー時のカーソルを変更 */
-        }
-        
-        .event-item:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 11;
-        }
-        
-        .event-type {
-            display: inline-block;
-            padding: 2px 5px;
-            font-size: 0.7rem;
-            border-radius: 3px;
-            margin-bottom: 3px;
-        }
-        
-        .event-building {
-            background-color: #e8f5e9;
-            color: #1b5e20;
-        }
-        
-        .event-publication {
-            background-color: #fff3e0;
-            color: #e65100;
-        }
-        
-        .event-essay {
-            background-color: #f3e5f5;
-            color: #4a148c;
-        }
-        
-        .event-title {
-            font-weight: bold;
-            margin-bottom: 3px;
-        }
-        
-        /* 説明文を最初は非表示に */
-        .event-description {
-            display: none;
-            padding-top: 5px;
-            font-size: 0.75rem;
-            color: #666;
-            border-top: 1px dotted #ddd;
-            margin-top: 5px;
-        }
-        
-        /* ホバー時に説明文を表示 */
-        .event-item:hover .event-description {
-            display: block;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            font-size: 1.2rem;
-            color: #666;
-        }
-        
-        .zoom-controls {
-            display: none; /* ズームコントロールを非表示に */
-        }
-        
-        .zoom-controls button {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 0.5rem;
-            margin: 0 0.2rem;
-            cursor: pointer;
-        }
-        
-        .zoom-controls button:hover {
-            background-color: #e9ecef;
-        }
-        
-        @media (max-width: 768px) {
-            .architect-name {
-                width: 100px;
-            }
-            
-            .architect-timeline {
-                margin-left: 100px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>建築家年表</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+}
+
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+    overflow-x: hidden;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1a1a1a;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    z-index: 1000;
+}
+
+h1 {
+    font-weight: 400;
+    letter-spacing: 1px;
+    font-size: 1.5rem;
+    color: #ffffff;
+}
+
+.controls {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background-color: #1a1a1a;
+    padding: 0.5rem 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    z-index: 999;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-box {
+    padding: 0.5rem;
+    width: 250px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+}
+
+.container {
+    margin-top: 140px;
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.timeline {
+    position: relative;
+    min-width: 5000px; /* 横スクロールのため十分な幅を確保 */
+}
+
+.timeline-header {
+    display: flex;
+    border-bottom: 1px solid #333;
+    margin-bottom: 1rem;
+}
+
+.year-marker {
+    flex: 0 0 100px; /* 5年ごとに100px幅 */
+    text-align: center;
+    font-weight: bold;
+    padding: 0.5rem 0;
+    border-right: 1px solid #333;
+    color: #b0b0b0;
+}
+
+.architect-row {
+    position: relative;
+    margin-bottom: 1rem; /* 縦方向の間隔を狭く */
+    min-height: 80px; /* 高さを少し小さく */
+}
+
+.architect-name {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 150px;
+    text-align: right;
+    padding-right: 1rem;
+    font-weight: 300; /* フォントを細く */
+    font-size: 0.9rem; /* フォントを小さく */
+    z-index: 5;
+    color: #b0b0b0;
+}
+
+.architect-lifespan {
+    position: absolute;
+    top: 0;
+    left: 150px;
+    height: 40px;
+    background-color: rgba(255, 165, 0, 0.15); /* オレンジ色をダークテーマに合わせて調整 */
+    border: 1px solid rgba(255, 165, 0, 0.3); /* オレンジ系の枠線 */
+    border-radius: 4px;
+    z-index: 1;
+}
+
+.architect-timeline {
+    position: relative;
+    margin-left: 150px;
+    min-height: 80px; /* 高さを少し小さく */
+}
+
+.event-item {
+    position: absolute;
+    top: 0; /* 帯の上に表示するように変更 */
+    width: 100px; /* PIXELS_PER_YEARと同じ幅 */
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 10;
+    cursor: pointer; /* ホバー時のカーソルを変更 */
+    color: #e0e0e0;
+}
+
+.event-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    z-index: 11;
+    background-color: #333;
+}
+
+.event-type {
+    display: inline-block;
+    padding: 2px 5px;
+    font-size: 0.7rem;
+    border-radius: 3px;
+    margin-bottom: 3px;
+}
+
+.event-building {
+    background-color: #1b4e20;
+    color: #a5d6a7;
+}
+
+.event-publication {
+    background-color: #6d4c41;
+    color: #d7ccc8;
+}
+
+.event-essay {
+    background-color: #4a148c;
+    color: #ce93d8;
+}
+
+.event-title {
+    font-weight: bold;
+    margin-bottom: 3px;
+    color: #ffffff;
+}
+
+/* 説明文を最初は非表示に */
+.event-description {
+    display: none;
+    padding-top: 5px;
+    font-size: 0.75rem;
+    color: #a0a0a0;
+    border-top: 1px dotted #444;
+    margin-top: 5px;
+}
+
+/* ホバー時に説明文を表示 */
+.event-item:hover .event-description {
+    display: block;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #a0a0a0;
+}
+
+.zoom-controls {
+    display: none; /* ズームコントロールを非表示に */
+}
+
+.zoom-controls button {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin: 0 0.2rem;
+    cursor: pointer;
+}
+
+.zoom-controls button:hover {
+    background-color: #e9ecef;
+}
+
+@media (max-width: 768px) {
+    .architect-name {
+        width: 100px;
+    }
+    
+    .architect-timeline {
+        margin-left: 100px;
+    }
+}
+</style>
 </head>
 <body>
-    <header>
-        <h1>建築家年表</h1>
-    </header>
-    
-    <div class="controls">
-        <div class="search">
-            <input type="text" id="search-box" class="search-box" placeholder="建築家名、プロジェクト名で検索...">
-        </div>
-        <div class="filter">
-            <select id="filter-select">
-                <option value="all">すべての項目</option>
-                <option value="building">建築作品</option>
-                <option value="publication">出版物</option>
-                <option value="essay">論考</option>
-            </select>
-        </div>
-    </div>
-    
-    <div class="container">
-        <div id="timeline" class="timeline">
-            <div class="loading">データを読み込んでいます...</div>
-        </div>
-    </div>
+<header>
+<h1>建築家年表</h1>
+</header>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script>
-        // CSV として公開されたスプレッドシートの URL
-        // あなたのスプレッドシートのCSV公開URLに置き換えてください
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pub?output=csv';
+<div class="controls">
+<div class="search">
+    <input type="text" id="search-box" class="search-box" placeholder="建築家名、プロジェクト名で検索...">
+</div>
+<div class="filter">
+    <select id="filter-select">
+        <option value="all">すべての項目</option>
+        <option value="building">建築作品</option>
+        <option value="publication">出版物</option>
+        <option value="essay">論考</option>
+    </select>
+</div>
+</div>
+
+<div class="container">
+<div id="timeline" class="timeline">
+    <div class="loading">データを読み込んでいます...</div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script>
+// CSV として公開されたスプレッドシートの URL
+// あなたのスプレッドシートのCSV公開URLに置き換えてください
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pub?output=csv';
+
+// サンプルデータ（CSVの取得に失敗した場合のフォールバック）
+const SAMPLE_DATA = [
+    {"year": 1867, "category": "birth", "architect": "フランク・ロイド・ライト", "title": "フランク・ロイド・ライト誕生", "description": "アメリカ合衆国ウィスコンシン州で生まれる"},
+    {"year": 1887, "category": "building", "architect": "フランク・ロイド・ライト", "title": "ユニティ・テンプル", "description": "シカゴ郊外オークパークに建設された初期の代表作"},
+    {"year": 1910, "category": "publication", "architect": "フランク・ロイド・ライト", "title": "オーガニック・アーキテクチャ", "description": "建築の原理に関する著書"},
+    {"year": 1916, "category": "building", "architect": "フランク・ロイド・ライト", "title": "帝国ホテル", "description": "東京に建設され、関東大震災にも耐えたホテル建築"},
+    {"year": 1936, "category": "building", "architect": "フランク・ロイド・ライト", "title": "落水荘（カウフマン邸）", "description": "ペンシルバニア州の滝の上に建つ名作住宅"},
+    {"year": 1959, "category": "death", "architect": "フランク・ロイド・ライト", "title": "フランク・ロイド・ライト死去", "description": "91歳でアリゾナ州フェニックスにて死去"},
+    {"year": 1887, "category": "birth", "architect": "ル・コルビュジエ", "title": "ル・コルビュジエ誕生", "description": "スイスのラ・ショー・ド・フォンで生まれる"},
+    {"year": 1923, "category": "publication", "architect": "ル・コルビュジエ", "title": "建築をめざして", "description": "モダニズム建築の原則を示した著作"},
+    {"year": 1928, "category": "building", "architect": "ル・コルビュジエ", "title": "サヴォア邸", "description": "パリ郊外ポワシーに建つモダニズム住宅の傑作"},
+    {"year": 1952, "category": "building", "architect": "ル・コルビュジエ", "title": "ロンシャン礼拝堂", "description": "フランスのロンシャンに建つ曲線的な形態の教会"},
+    {"year": 1965, "category": "death", "architect": "ル・コルビュジエ", "title": "ル・コルビュジエ死去", "description": "フランス・コートダジュールの海で水浴中に死去"},
+    {"year": 1883, "category": "birth", "architect": "ミース・ファン・デル・ローエ", "title": "ミース・ファン・デル・ローエ誕生", "description": "ドイツのアーヘンで生まれる"},
+    {"year": 1929, "category": "building", "architect": "ミース・ファン・デル・ローエ", "title": "バルセロナ・パビリオン", "description": "バルセロナ万博のドイツ館として建設"},
+    {"year": 1951, "category": "essay", "architect": "ミース・ファン・デル・ローエ", "title": "少ないことは豊かなこと", "description": "ミニマリズムの建築思想を語った論考"},
+    {"year": 1956, "category": "building", "architect": "ミース・ファン・デル・ローエ", "title": "シーグラム・ビル", "description": "ニューヨークに建つガラスのオフィスビル"},
+    {"year": 1969, "category": "death", "architect": "ミース・ファン・デル・ローエ", "title": "ミース・ファン・デル・ローエ死去", "description": "シカゴにて83歳で死去"},
+    {"year": 1901, "category": "birth", "architect": "安藤忠雄", "title": "安藤忠雄誕生", "description": "大阪に生まれる"},
+    {"year": 1976, "category": "building", "architect": "安藤忠雄", "title": "住吉の長屋", "description": "大阪市住吉区の住宅作品"},
+    {"year": 1989, "category": "building", "architect": "安藤忠雄", "title": "光の教会", "description": "大阪府茨木市の宗教建築"},
+    {"year": 1995, "category": "publication", "architect": "安藤忠雄", "title": "建築を語る", "description": "建築思想についての著書"},
+    {"year": 2013, "category": "building", "architect": "安藤忠雄", "title": "地中美術館", "description": "直島の美術館建築"}
+];
+
+// 年表の設定
+const START_YEAR = 1950;
+const END_YEAR = 2025;
+const YEARS_PER_MARKER = 1;
+const PIXELS_PER_YEAR = 100; // 年ごとの幅を広く設定
+
+// ズーム関連
+let zoomLevel = 1;
+
+// CSVデータを読み込む
+async function loadData() {
+    try {
+        const response = await fetch(CSV_URL);
         
-        // サンプルデータ（CSVの取得に失敗した場合のフォールバック）
-        const SAMPLE_DATA = [
-            {"year": 1867, "category": "birth", "architect": "フランク・ロイド・ライト", "title": "フランク・ロイド・ライト誕生", "description": "アメリカ合衆国ウィスコンシン州で生まれる"},
-            {"year": 1887, "category": "building", "architect": "フランク・ロイド・ライト", "title": "ユニティ・テンプル", "description": "シカゴ郊外オークパークに建設された初期の代表作"},
-            {"year": 1910, "category": "publication", "architect": "フランク・ロイド・ライト", "title": "オーガニック・アーキテクチャ", "description": "建築の原理に関する著書"},
-            {"year": 1916, "category": "building", "architect": "フランク・ロイド・ライト", "title": "帝国ホテル", "description": "東京に建設され、関東大震災にも耐えたホテル建築"},
-            {"year": 1936, "category": "building", "architect": "フランク・ロイド・ライト", "title": "落水荘（カウフマン邸）", "description": "ペンシルバニア州の滝の上に建つ名作住宅"},
-            {"year": 1959, "category": "death", "architect": "フランク・ロイド・ライト", "title": "フランク・ロイド・ライト死去", "description": "91歳でアリゾナ州フェニックスにて死去"},
-            {"year": 1887, "category": "birth", "architect": "ル・コルビュジエ", "title": "ル・コルビュジエ誕生", "description": "スイスのラ・ショー・ド・フォンで生まれる"},
-            {"year": 1923, "category": "publication", "architect": "ル・コルビュジエ", "title": "建築をめざして", "description": "モダニズム建築の原則を示した著作"},
-            {"year": 1928, "category": "building", "architect": "ル・コルビュジエ", "title": "サヴォア邸", "description": "パリ郊外ポワシーに建つモダニズム住宅の傑作"},
-            {"year": 1952, "category": "building", "architect": "ル・コルビュジエ", "title": "ロンシャン礼拝堂", "description": "フランスのロンシャンに建つ曲線的な形態の教会"},
-            {"year": 1965, "category": "death", "architect": "ル・コルビュジエ", "title": "ル・コルビュジエ死去", "description": "フランス・コートダジュールの海で水浴中に死去"},
-            {"year": 1883, "category": "birth", "architect": "ミース・ファン・デル・ローエ", "title": "ミース・ファン・デル・ローエ誕生", "description": "ドイツのアーヘンで生まれる"},
-            {"year": 1929, "category": "building", "architect": "ミース・ファン・デル・ローエ", "title": "バルセロナ・パビリオン", "description": "バルセロナ万博のドイツ館として建設"},
-            {"year": 1951, "category": "essay", "architect": "ミース・ファン・デル・ローエ", "title": "少ないことは豊かなこと", "description": "ミニマリズムの建築思想を語った論考"},
-            {"year": 1956, "category": "building", "architect": "ミース・ファン・デル・ローエ", "title": "シーグラム・ビル", "description": "ニューヨークに建つガラスのオフィスビル"},
-            {"year": 1969, "category": "death", "architect": "ミース・ファン・デル・ローエ", "title": "ミース・ファン・デル・ローエ死去", "description": "シカゴにて83歳で死去"},
-            {"year": 1901, "category": "birth", "architect": "安藤忠雄", "title": "安藤忠雄誕生", "description": "大阪に生まれる"},
-            {"year": 1976, "category": "building", "architect": "安藤忠雄", "title": "住吉の長屋", "description": "大阪市住吉区の住宅作品"},
-            {"year": 1989, "category": "building", "architect": "安藤忠雄", "title": "光の教会", "description": "大阪府茨木市の宗教建築"},
-            {"year": 1995, "category": "publication", "architect": "安藤忠雄", "title": "建築を語る", "description": "建築思想についての著書"},
-            {"year": 2013, "category": "building", "architect": "安藤忠雄", "title": "地中美術館", "description": "直島の美術館建築"}
-        ];
+        if (!response.ok) {
+            throw new Error(`HTTPエラー: ${response.status}`);
+        }
         
-        // 年表の設定
-        const START_YEAR = 1950;
-        const END_YEAR = 2025;
-        const YEARS_PER_MARKER = 1;
-        const PIXELS_PER_YEAR = 100; // 年ごとの幅を広く設定
+        const csvText = await response.text();
         
-        // ズーム関連
-        let zoomLevel = 1;
+        if (!csvText || csvText.trim() === '') {
+            throw new Error('CSVデータが空です');
+        }
         
-        // CSVデータを読み込む
-        async function loadData() {
-            try {
-                const response = await fetch(CSV_URL);
+        // デバッグ情報
+        console.log('CSVデータ取得成功 (先頭部分):', csvText.substring(0, 200));
+        
+        // Papa Parse を使って CSV をパース
+        Papa.parse(csvText, {
+            header: true,
+            dynamicTyping: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                console.log('CSVパース結果:', results);
                 
-                if (!response.ok) {
-                    throw new Error(`HTTPエラー: ${response.status}`);
+                if (!results.data || results.data.length === 0) {
+                    throw new Error('パースしたデータが空です');
                 }
                 
-                const csvText = await response.text();
-                
-                if (!csvText || csvText.trim() === '') {
-                    throw new Error('CSVデータが空です');
-                }
-                
-                // デバッグ情報
-                console.log('CSVデータ取得成功 (先頭部分):', csvText.substring(0, 200));
-                
-                // Papa Parse を使って CSV をパース
-                Papa.parse(csvText, {
-                    header: true,
-                    dynamicTyping: true,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        console.log('CSVパース結果:', results);
-                        
-                        if (!results.data || results.data.length === 0) {
-                            throw new Error('パースしたデータが空です');
-                        }
-                        
-                        // パースしたデータを処理
-                        processData(results.data);
-                    },
-                    error: function(error) {
-                        console.error('CSVのパースに失敗しました:', error);
-                        // エラー時はサンプルデータを使用
-                        processData(SAMPLE_DATA);
-                    }
-                });
-            } catch (error) {
-                console.error('データの取得に失敗しました:', error);
-                
-                // エラーの詳細情報を表示（デバッグ用）
-                const errorDetails = document.createElement('div');
-                errorDetails.style.color = 'red';
-                errorDetails.style.padding = '1rem';
-                errorDetails.style.backgroundColor = '#fff8f8';
-                errorDetails.style.borderRadius = '4px';
-                errorDetails.style.marginBottom = '1rem';
-                errorDetails.innerHTML = `
-                    <h3>データ取得エラー</h3>
-                    <p>エラーメッセージ: ${error.message}</p>
-                    <p>CSV URL: ${CSV_URL}</p>
-                    <p>注: サンプルデータを使用して表示します</p>
-                `;
-                document.getElementById('timeline').innerHTML = '';
-                document.getElementById('timeline').appendChild(errorDetails);
-                
+                // パースしたデータを処理
+                processData(results.data);
+            },
+            error: function(error) {
+                console.error('CSVのパースに失敗しました:', error);
                 // エラー時はサンプルデータを使用
                 processData(SAMPLE_DATA);
             }
+        });
+    } catch (error) {
+        console.error('データの取得に失敗しました:', error);
+        
+        // エラーの詳細情報を表示（デバッグ用）
+        const errorDetails = document.createElement('div');
+        errorDetails.style.color = 'red';
+        errorDetails.style.padding = '1rem';
+        errorDetails.style.backgroundColor = '#fff8f8';
+        errorDetails.style.borderRadius = '4px';
+        errorDetails.style.marginBottom = '1rem';
+        errorDetails.innerHTML = `
+            <h3>データ取得エラー</h3>
+            <p>エラーメッセージ: ${error.message}</p>
+            <p>CSV URL: ${CSV_URL}</p>
+            <p>注: サンプルデータを使用して表示します</p>
+        `;
+        document.getElementById('timeline').innerHTML = '';
+        document.getElementById('timeline').appendChild(errorDetails);
+        
+        // エラー時はサンプルデータを使用
+        processData(SAMPLE_DATA);
+    }
+}
+
+// データの処理と年表の表示
+function processData(data) {
+    // 建築家ごとにデータをグループ化
+    const architects = {};
+    const birthDeathInfo = {};
+    
+    // 建築家の生没年情報を取得
+    data.forEach(item => {
+        if (!item.architect || !item.year) return;
+        
+        // yearが文字列の場合は数値に変換
+        if (typeof item.year === 'string') {
+            item.year = parseInt(item.year);
         }
         
-        // データの処理と年表の表示
-        function processData(data) {
-            // 建築家ごとにデータをグループ化
-            const architects = {};
-            const birthDeathInfo = {};
-            
-            // 建築家の生没年情報を取得
-            data.forEach(item => {
-                if (!item.architect || !item.year) return;
-                
-                // yearが文字列の場合は数値に変換
-                if (typeof item.year === 'string') {
-                    item.year = parseInt(item.year);
-                }
-                
-                if (!architects[item.architect]) {
-                    architects[item.architect] = [];
-                }
-                
-                architects[item.architect].push(item);
-                
-                // 生没年の情報を記録
-                if (item.category === 'birth') {
-                    if (!birthDeathInfo[item.architect]) {
-                        birthDeathInfo[item.architect] = {};
-                    }
-                    birthDeathInfo[item.architect].birth = item.year;
-                }
-                
-                if (item.category === 'death') {
-                    if (!birthDeathInfo[item.architect]) {
-                        birthDeathInfo[item.architect] = {};
-                    }
-                    birthDeathInfo[item.architect].death = item.year;
-                }
-            });
-            
-            // 年表を描画
-            renderTimeline(architects, birthDeathInfo);
-            
-            // 検索とフィルタ機能をセットアップ
-            setupFilters(data, architects, birthDeathInfo);
+        if (!architects[item.architect]) {
+            architects[item.architect] = [];
         }
         
-        // 年表の描画
-        function renderTimeline(architects, birthDeathInfo) {
-            const timelineElement = document.getElementById('timeline');
-            timelineElement.innerHTML = '';
+        architects[item.architect].push(item);
+        
+        // 生没年の情報を記録
+        if (item.category === 'birth') {
+            if (!birthDeathInfo[item.architect]) {
+                birthDeathInfo[item.architect] = {};
+            }
+            birthDeathInfo[item.architect].birth = item.year;
+        }
+        
+        if (item.category === 'death') {
+            if (!birthDeathInfo[item.architect]) {
+                birthDeathInfo[item.architect] = {};
+            }
+            birthDeathInfo[item.architect].death = item.year;
+        }
+    });
+    
+    // 年表を描画
+    renderTimeline(architects, birthDeathInfo);
+    
+    // 検索とフィルタ機能をセットアップ
+    setupFilters(data, architects, birthDeathInfo);
+}
+
+// 年表の描画
+function renderTimeline(architects, birthDeathInfo) {
+    const timelineElement = document.getElementById('timeline');
+    timelineElement.innerHTML = '';
+    
+    // 年マーカーのヘッダーを作成
+    const timelineHeader = document.createElement('div');
+    timelineHeader.className = 'timeline-header';
+    
+    // マーカーの前に空白を追加（建築家名の列のため）
+    const emptyMarker = document.createElement('div');
+    emptyMarker.style.width = '150px';
+    emptyMarker.style.flexShrink = '0';
+    timelineHeader.appendChild(emptyMarker);
+    
+    // 年マーカーを作成
+    for (let year = START_YEAR; year <= END_YEAR; year += YEARS_PER_MARKER) {
+        const yearMarker = document.createElement('div');
+        yearMarker.className = 'year-marker';
+        yearMarker.textContent = year;
+        yearMarker.style.width = (PIXELS_PER_YEAR * YEARS_PER_MARKER) + 'px';
+        timelineHeader.appendChild(yearMarker);
+    }
+    
+    timelineElement.appendChild(timelineHeader);
+    
+    // 各建築家の行を作成
+    Object.keys(architects).forEach(architectName => {
+        const items = architects[architectName];
+        const bdInfo = birthDeathInfo[architectName] || {};
+        
+        const architectRow = document.createElement('div');
+        architectRow.className = 'architect-row';
+        architectRow.setAttribute('data-architect', architectName);
+        
+        // 建築家名
+        const nameElement = document.createElement('div');
+        nameElement.className = 'architect-name';
+        nameElement.textContent = architectName;
+        architectRow.appendChild(nameElement);
+        
+        // 建築家のタイムライン
+        const timelineContainer = document.createElement('div');
+        timelineContainer.className = 'architect-timeline';
+        
+        // 生存期間の帯を表示（birth/deathがない場合は表示期間の開始/終了を使用）
+        const birthYear = bdInfo.birth || START_YEAR; // birthがなければ開始年
+        const deathYear = bdInfo.death || END_YEAR; // deathがなければ終了年まで
+        
+        if (birthYear && deathYear) {
+            const lifespanElement = document.createElement('div');
+            lifespanElement.className = 'architect-lifespan';
             
-            // 年マーカーのヘッダーを作成
-            const timelineHeader = document.createElement('div');
-            timelineHeader.className = 'timeline-header';
+            // 位置を計算
+            const startPosition = Math.max(0, (birthYear - START_YEAR) * PIXELS_PER_YEAR);
+            const endPosition = Math.min((END_YEAR - START_YEAR) * PIXELS_PER_YEAR, (deathYear - START_YEAR) * PIXELS_PER_YEAR);
+            const width = endPosition - startPosition;
             
-            // 年マーカーを作成
-            for (let year = START_YEAR; year <= END_YEAR; year += YEARS_PER_MARKER) {
-                const yearMarker = document.createElement('div');
-                yearMarker.className = 'year-marker';
-                yearMarker.textContent = year;
-                yearMarker.style.width = (PIXELS_PER_YEAR * YEARS_PER_MARKER) + 'px';
-                timelineHeader.appendChild(yearMarker);
+            lifespanElement.style.left = (150 + startPosition) + 'px';
+            lifespanElement.style.width = width + 'px';
+            
+            timelineContainer.appendChild(lifespanElement);
+        }
+        
+        // イベントを表示
+        items.forEach(item => {
+            // birth/deathカテゴリは帯として表示済みなのでスキップ
+            if (item.category === 'birth' || item.category === 'death') return;
+            
+            const eventElement = document.createElement('div');
+            eventElement.className = 'event-item';
+            eventElement.setAttribute('data-category', item.category);
+            
+            // イベント種類とタイトルを表示するために、幅に合わせてサイズ調整
+            // 位置を計算
+            const position = (item.year - START_YEAR) * PIXELS_PER_YEAR;
+            eventElement.style.left = position + 'px';
+            eventElement.style.width = PIXELS_PER_YEAR + 'px';
+            
+            // イベント種類
+            const typeElement = document.createElement('div');
+            typeElement.className = `event-type event-${item.category}`;
+            typeElement.textContent = getCategoryLabel(item.category);
+            eventElement.appendChild(typeElement);
+            
+            // タイトル
+            const titleElement = document.createElement('div');
+            titleElement.className = 'event-title';
+            titleElement.textContent = item.title;
+            eventElement.appendChild(titleElement);
+            
+            // 説明（ホバー時のみ表示）
+            if (item.description) {
+                const descElement = document.createElement('div');
+                descElement.className = 'event-description';
+                descElement.textContent = item.description;
+                eventElement.appendChild(descElement);
             }
             
-            timelineElement.appendChild(timelineHeader);
-            
-            // 各建築家の行を作成
-            Object.keys(architects).forEach((architectName, index) => {
-                const items = architects[architectName];
-                const bdInfo = birthDeathInfo[architectName] || {};
-                
-                const architectRow = document.createElement('div');
-                architectRow.className = 'architect-row';
-                architectRow.setAttribute('data-architect', architectName);
-                
-                // 建築家名
-                const nameElement = document.createElement('div');
-                nameElement.className = 'architect-name';
-                nameElement.textContent = architectName;
-                nameElement.style.top = (184 + index * 120) + 'px'; // 位置を調整: ヘッダー(140px) + マージン + 行間隔
-                architectRow.appendChild(nameElement);
-                
-                // 建築家のタイムライン
-                const timelineContainer = document.createElement('div');
-                timelineContainer.className = 'architect-timeline';
-                
-                // 生存期間の帯を表示（birth/deathがない場合は表示期間の開始/終了を使用）
-                const birthYear = bdInfo.birth || START_YEAR; // birthがなければ開始年
-                const deathYear = bdInfo.death || END_YEAR; // deathがなければ終了年まで
-                
-                if (birthYear && deathYear) {
-                    const lifespanElement = document.createElement('div');
-                    lifespanElement.className = 'architect-lifespan';
-                    
-                    // 位置を計算
-                    const startPosition = Math.max(0, (birthYear - START_YEAR) * PIXELS_PER_YEAR);
-                    const endPosition = Math.min((END_YEAR - START_YEAR) * PIXELS_PER_YEAR, (deathYear - START_YEAR) * PIXELS_PER_YEAR);
-                    const width = endPosition - startPosition;
-                    
-                    lifespanElement.style.left = (150 + startPosition) + 'px';
-                    lifespanElement.style.width = width + 'px';
-                    
-                    timelineContainer.appendChild(lifespanElement);
-                }
-                
-                // イベントを表示
-                items.forEach(item => {
-                    // birth/deathカテゴリは帯として表示済みなのでスキップ
-                    if (item.category === 'birth' || item.category === 'death') return;
-                    
-                    const eventElement = document.createElement('div');
-                    eventElement.className = 'event-item';
-                    eventElement.setAttribute('data-category', item.category);
-                    
-                    // イベント種類とタイトルを表示するために、幅に合わせてサイズ調整
-                    // 位置を計算
-                    const position = (item.year - START_YEAR) * PIXELS_PER_YEAR;
-                    eventElement.style.left = position + 'px';
-                    eventElement.style.width = PIXELS_PER_YEAR + 'px';
-                    
-                    // イベント種類
-                    const typeElement = document.createElement('div');
-                    typeElement.className = `event-type event-${item.category}`;
-                    typeElement.textContent = getCategoryLabel(item.category);
-                    eventElement.appendChild(typeElement);
-                    
-                    // タイトル
-                    const titleElement = document.createElement('div');
-                    titleElement.className = 'event-title';
-                    titleElement.textContent = item.title;
-                    eventElement.appendChild(titleElement);
-                    
-                    // 説明（ホバー時のみ表示）
-                    if (item.description) {
-                        const descElement = document.createElement('div');
-                        descElement.className = 'event-description';
-                        descElement.textContent = item.description;
-                        eventElement.appendChild(descElement);
-                    }
-                    
-                    timelineContainer.appendChild(eventElement);
-                });
-                
-                architectRow.appendChild(timelineContainer);
-                timelineElement.appendChild(architectRow);
-            });
-            
-            // ズーム機能をセットアップ
-            setupZoom();
-        }
+            timelineContainer.appendChild(eventElement);
+        });
         
-        // カテゴリ名を表示用に変換
-        function getCategoryLabel(category) {
-            const labels = {
-                'building': '建築作品',
-                'publication': '出版',
-                'essay': '論考'
-            };
-            return labels[category] || category;
-        }
+        architectRow.appendChild(timelineContainer);
+        timelineElement.appendChild(architectRow);
+    });
+    
+    // ズーム機能をセットアップ
+    setupZoom();
+}
+
+// カテゴリ名を表示用に変換
+function getCategoryLabel(category) {
+    const labels = {
+        'building': '建築作品',
+        'publication': '出版',
+        'essay': '論考'
+    };
+    return labels[category] || category;
+}
+
+// フィルタと検索機能のセットアップ
+function setupFilters(data, architects, birthDeathInfo) {
+    const searchBox = document.getElementById('search-box');
+    const filterSelect = document.getElementById('filter-select');
+    
+    // 検索機能
+    searchBox.addEventListener('input', () => {
+        const searchTerm = searchBox.value.toLowerCase();
+        const selectedFilter = filterSelect.value;
         
-        // フィルタと検索機能のセットアップ
-        function setupFilters(data, architects, birthDeathInfo) {
-            const searchBox = document.getElementById('search-box');
-            const filterSelect = document.getElementById('filter-select');
-            
-            // 検索機能
-            searchBox.addEventListener('input', () => {
-                const searchTerm = searchBox.value.toLowerCase();
-                const selectedFilter = filterSelect.value;
-                
-                // 絞り込みデータを作成
-                const filteredArchitects = {};
-                
-                Object.keys(architects).forEach(architectName => {
-                    // 建築家名で検索
-                    if (architectName.toLowerCase().includes(searchTerm)) {
-                        filteredArchitects[architectName] = filterItemsByCategory(architects[architectName], selectedFilter);
-                        return;
-                    }
-                    
-                    // イベントのタイトルや説明で検索
-                    const matchingItems = architects[architectName].filter(item => 
-                        (item.title && item.title.toLowerCase().includes(searchTerm)) ||
-                        (item.description && item.description.toLowerCase().includes(searchTerm))
-                    );
-                    
-                    if (matchingItems.length > 0) {
-                        filteredArchitects[architectName] = filterItemsByCategory(matchingItems, selectedFilter);
-                    }
-                });
-                
-                // 絞り込み結果で年表を再描画
-                renderTimeline(filteredArchitects, birthDeathInfo);
-            });
-            
-            // カテゴリフィルタ
-            filterSelect.addEventListener('change', () => {
-                const searchTerm = searchBox.value.toLowerCase();
-                const selectedFilter = filterSelect.value;
-                
-                // 絞り込みデータを作成
-                const filteredArchitects = {};
-                
-                Object.keys(architects).forEach(architectName => {
-                    // 検索語がある場合は検索も適用
-                    if (searchTerm && !architectName.toLowerCase().includes(searchTerm)) {
-                        const matchingItems = architects[architectName].filter(item => 
-                            (item.title && item.title.toLowerCase().includes(searchTerm)) ||
-                            (item.description && item.description.toLowerCase().includes(searchTerm))
-                        );
-                        
-                        if (matchingItems.length > 0) {
-                            filteredArchitects[architectName] = filterItemsByCategory(matchingItems, selectedFilter);
-                        }
-                    } else {
-                        filteredArchitects[architectName] = filterItemsByCategory(architects[architectName], selectedFilter);
-                    }
-                });
-                
-                // 絞り込み結果で年表を再描画
-                renderTimeline(filteredArchitects, birthDeathInfo);
-            });
-        }
+        // 絞り込みデータを作成
+        const filteredArchitects = {};
         
-        // カテゴリによるフィルタリング
-        function filterItemsByCategory(items, category) {
-            if (category === 'all') {
-                return items;
+        Object.keys(architects).forEach(architectName => {
+            // 建築家名で検索
+            if (architectName.toLowerCase().includes(searchTerm)) {
+                filteredArchitects[architectName] = filterItemsByCategory(architects[architectName], selectedFilter);
+                return;
             }
             
-            return items.filter(item => 
-                item.category === category || item.category === 'birth' || item.category === 'death'
+            // イベントのタイトルや説明で検索
+            const matchingItems = architects[architectName].filter(item => 
+                (item.title && item.title.toLowerCase().includes(searchTerm)) ||
+                (item.description && item.description.toLowerCase().includes(searchTerm))
             );
-        }
+            
+            if (matchingItems.length > 0) {
+                filteredArchitects[architectName] = filterItemsByCategory(matchingItems, selectedFilter);
+            }
+        });
         
-        // ズーム機能のセットアップ
-        function setupZoom() {
-            // ズーム機能は削除されたため、この関数は空になります
-            // ここにあった機能は拡大縮小ボタンを非表示にしたため削除しました
-        }
+        // 絞り込み結果で年表を再描画
+        renderTimeline(filteredArchitects, birthDeathInfo);
+    });
+    
+    // カテゴリフィルタ
+    filterSelect.addEventListener('change', () => {
+        const searchTerm = searchBox.value.toLowerCase();
+        const selectedFilter = filterSelect.value;
         
-        // ページ読み込み時にデータを取得
-        document.addEventListener('DOMContentLoaded', loadData);
-    </script>
+        // 絞り込みデータを作成
+        const filteredArchitects = {};
+        
+        Object.keys(architects).forEach(architectName => {
+            // 検索語がある場合は検索も適用
+            if (searchTerm && !architectName.toLowerCase().includes(searchTerm)) {
+                const matchingItems = architects[architectName].filter(item => 
+                    (item.title && item.title.toLowerCase().includes(searchTerm)) ||
+                    (item.description && item.description.toLowerCase().includes(searchTerm))
+                );
+                
+                if (matchingItems.length > 0) {
+                    filteredArchitects[architectName] = filterItemsByCategory(matchingItems, selectedFilter);
+                }
+            } else {
+                filteredArchitects[architectName] = filterItemsByCategory(architects[architectName], selectedFilter);
+            }
+        });
+        
+        // 絞り込み結果で年表を再描画
+        renderTimeline(filteredArchitects, birthDeathInfo);
+    });
+}
+
+// カテゴリによるフィルタリング
+function filterItemsByCategory(items, category) {
+    if (category === 'all') {
+        return items;
+    }
+    
+    return items.filter(item => 
+        item.category === category || item.category === 'birth' || item.category === 'death'
+    );
+}
+
+// ズーム機能のセットアップ
+function setupZoom() {
+    // ズーム機能は削除されたため、この関数は空になります
+    // ここにあった機能は拡大縮小ボタンを非表示にしたため削除しました
+}
+
+// ページ読み込み時にデータを取得
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
 </body>
 </html>
