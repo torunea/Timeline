@@ -113,7 +113,7 @@ h1 {
 }
 
 .year-marker {
-    /* flex: 0 0 100px; を削除 */
+    flex: 0 0 200px; /* PIXELS_PER_YEARと同じ値を設定 */
     text-align: center;
     font-weight: bold;
     padding: 0.5rem 0;
@@ -321,7 +321,7 @@ const SAMPLE_DATA = [
 const START_YEAR = 1950;
 const END_YEAR = 2025;
 const YEARS_PER_MARKER = 1;
-const PIXELS_PER_YEAR = 200; // 年ごとの幅を広く設定
+const PIXELS_PER_YEAR = 200; // .year-markerの幅と一致させる
 
 // ズーム関連
 let zoomLevel = 1;
