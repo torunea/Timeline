@@ -113,6 +113,7 @@ h1 {
 }
 
 .year-marker {
+    /* flex: 0 0 100px; を削除 */
     text-align: center;
     font-weight: bold;
     padding: 0.5rem 0;
@@ -449,7 +450,7 @@ function renderTimeline(architects, birthDeathInfo) {
         const yearMarker = document.createElement('div');
         yearMarker.className = 'year-marker';
         yearMarker.textContent = year;
-        yearMarker.style.width = `${PIXELS_PER_YEAR * YEARS_PER_MARKER}px !important`;
+        yearMarker.style.width = (PIXELS_PER_YEAR * YEARS_PER_MARKER) + 'px';
         timelineHeader.appendChild(yearMarker);
     }
     
