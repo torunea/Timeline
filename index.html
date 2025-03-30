@@ -450,7 +450,7 @@ function renderTimeline(architects, birthDeathInfo) {
         const yearMarker = document.createElement('div');
         yearMarker.className = 'year-marker';
         yearMarker.textContent = year;
-        yearMarker.style.width = (PIXELS_PER_YEAR * YEARS_PER_MARKER) + 'px';
+        yearMarker.style.width = `${PIXELS_PER_YEAR * YEARS_PER_MARKER}px !important`;
         timelineHeader.appendChild(yearMarker);
     }
     
