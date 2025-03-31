@@ -105,29 +105,32 @@ h1 {
     padding-top: 0; /* 上部の余白を削除 */
 }
 
+/* タイムラインスクロール領域 - 縦横両方のスクロールを有効に */
 .timeline-scroll {
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow: auto; /* 横方向と縦方向の両方のスクロールを有効化 */
     flex-grow: 1;
-    height: 100%; /* コンテナの高さいっぱいに */
+    height: calc(100vh - 140px - 2rem); /* ビューポート高さから上部マージンとパディングを引く */
 }
 
+/* タイムライン本体 */
 .timeline {
     position: relative;
     min-width: 5000px;
     padding-left: 200px; /* 人物名の表示用の余白 */
-    height: 100%; /* 高さいっぱいに */
-    min-height: 500px; /* 最低限の高さを確保 */
+    /* 高さを固定しない - コンテンツに合わせて伸縮させる */
+    /* min-height: 100%; を削除 */
 }
 
+/* タイムラインヘッダー（年の表示）を画面上部に固定 */
 .timeline-header {
     display: flex;
     border-bottom: 1px solid #333;
-    margin-bottom: 1rem;
     position: sticky;
     top: 0;
     background-color: #121212;
-    z-index: 50;
+    z-index: 100;
+    width: fit-content; /* 内容に合わせて幅を設定 */
+    min-width: 100%;
 }
 
 .year-marker {
@@ -139,16 +142,17 @@ h1 {
     color: #b0b0b0;
 }
 
+/* 人物名も固定表示するために必要なスタイル */
 .person-row {
     position: relative;
     margin-bottom: 1rem;
     min-height: 80px;
 }
 
-/* 人物名のスタイル - 帯の左端に表示 */
+/* 人物名のスタイル - 左側に固定 */
 .person-name {
-    position: absolute;
-    left: -180px; /* 帯の左側に配置 */
+    position: sticky;
+    left: 20px; /* 左端からの距離 */
     width: 170px;
     text-align: right;
     padding-right: 1rem;
@@ -160,6 +164,9 @@ h1 {
     flex-direction: column;
     justify-content: flex-start;
     top: 0;
+    background-color: rgba(18, 18, 18, 0.9); /* 背景色を少し透過させる */
+    padding: 5px;
+    border-radius: 4px;
 }
 
 /* 属性ラベルのスタイル */
