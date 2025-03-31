@@ -261,13 +261,29 @@ function renderTimeline(persons, birthDeathInfo) {
                 const groupElement = document.createElement('div');
                 groupElement.className = 'event-group';
                 groupElement.style.left = position + 'px';
-                groupElement.style.width = PIXELS_PER_YEAR + 'px'; //複数イベント時の幅調整ここ？（追加）
-                
-                // ヘッダー（件数を表示）
+                groupElement.style.width = PIXELS_PER_YEAR + 'px';
+
+                // ヘッダー（カテゴリごとの件数を表示）
                 const headerElement = document.createElement('div');
                 headerElement.className = 'event-group-header';
-                headerElement.innerHTML = `<span class="event-count">${events.length}件のイベント</span>`;
-                
+
+                // カテゴリごとにイベント数をカウント
+                const categoryCounts = {};
+                events.forEach(item => {
+                    if (!categoryCounts[item.category]) {
+                        categoryCounts[item.category] = 0;
+                    }
+                    categoryCounts[item.category]++;
+                });
+
+                // バッジ形式でカテゴリごとの件数を表示
+                let headerContent = '';
+                Object.keys(categoryCounts).forEach(category => {
+                    headerContent += `<span class="event-count-badge badge-${category}">${categoryCounts[category]}</span>`;
+                });
+
+                headerElement.innerHTML = headerContent;
+
                 // コンテンツ（初期状態では非表示）
                 const contentElement = document.createElement('div');
                 contentElement.className = 'event-group-content';

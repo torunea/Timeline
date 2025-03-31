@@ -281,6 +281,41 @@ h1 {
     color: #ffffff;
 }
 
+/* タグごとの数字表示 */
+.event-count-badge {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin: 0 2px;
+    color: white;
+  }
+
+/* カテゴリごとの色 */
+.badge-building {
+    background-color: #1b4e20;
+}
+
+.badge-publication {
+    background-color: #6d4c41;
+}
+
+.badge-essay {
+    background-color: #4a148c;
+}
+
+.badge-artwork {
+    background-color: #283593;
+}
+
+.badge-exhibition {
+    background-color: #01579b;
+}
+
 /* イベントグループのスタイル */
 .event-group {
     position: absolute;
