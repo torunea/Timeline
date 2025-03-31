@@ -81,6 +81,7 @@ h1 {
     padding: 1rem;
     display: flex;
     overflow: hidden;
+    height: calc(100vh - 140px - 2rem); /* ビューポート高さから上部マージンとパディングを引く */
 }
 
 .person-list {
@@ -106,14 +107,17 @@ h1 {
 
 .timeline-scroll {
     overflow-x: auto;
+    overflow-y: hidden;
     flex-grow: 1;
+    height: 100%; /* コンテナの高さいっぱいに */
 }
 
 .timeline {
     position: relative;
     min-width: 5000px;
     padding-left: 200px; /* 人物名の表示用の余白 */
-    padding-bottom: 600px; /* 下部に余白を追加 */
+    height: 100%; /* 高さいっぱいに */
+    min-height: 500px; /* 最低限の高さを確保 */
 }
 
 .timeline-header {
