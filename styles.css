@@ -90,9 +90,10 @@ h1 {
 .filter-group, .category-filter-container {
     display: flex;
     flex-direction: column;
-    background-color: #1a1a1a;
+    background-color: transparent; /* 背景色を透明に変更 */
     padding: 8px;
     border-radius: 4px;
+    min-height: 60px; /* 最小高さを設定して揃える */
 }
 
 /* フィルターグループの内部配置を調整 */
@@ -100,11 +101,19 @@ h1 {
     margin-top: 0; /* 上部マージンを削除 */
 }
 
+/* 属性フィルターのセレクトボックス */
 #attribution-filter {
-    margin-left: 0; /* 左マージンを削除 */
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin: 0; /* すべてのマージンをリセット */
+    width: 150px; /* 幅を固定 */
 }
 
-#filter-select, #attribution-filter {
+#filter-select {
     background-color: #2a2a2a;
     color: #e0e0e0;
     border: 1px solid #333;
