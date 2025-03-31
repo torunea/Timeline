@@ -16,9 +16,9 @@ function getAttributionLabel(attribution) {
         'architect': '建築家',
         'artist': '芸術家',
         'writer': '作家',
-        'scientist': '科学者',
+        'critic': '批評家',
         'philosopher': '哲学者',
-        'politician': '政治家',
+        'videographer': '映像作家',
         'musician': '音楽家',
         'default': 'その他'
     };
@@ -29,10 +29,10 @@ function getAttributionLabel(attribution) {
 function getCategoryLabel(category) {
     const labels = {
         'building': '建築作品',
-        'publication': '出版',
+        'publication': '出版物',
         'essay': '論考',
         'artwork': '芸術作品',
-        'discovery': '発見・発明'
+        'exhibition': '展覧会'
     };
     return labels[category] || category;
 }

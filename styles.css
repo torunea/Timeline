@@ -188,7 +188,7 @@ h1 {
     border: 1px solid rgba(46, 139, 87, 0.3);
 }
 
-.attribution-scientist {
+.attribution-critic {
     background-color: rgba(70, 130, 180, 0.15);
     border: 1px solid rgba(70, 130, 180, 0.3);
 }
@@ -198,7 +198,7 @@ h1 {
     border: 1px solid rgba(178, 34, 34, 0.3);
 }
 
-.attribution-politician {
+.attribution-videographer {
     background-color: rgba(184, 134, 11, 0.15);
     border: 1px solid rgba(184, 134, 11, 0.3);
 }
@@ -269,7 +269,7 @@ h1 {
     color: #9fa8da;
 }
 
-.event-discovery {
+.event-exhibition {
     background-color: #01579b;
     color: #81d4fa;
 }
