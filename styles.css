@@ -69,24 +69,35 @@ h1 {
     align-items: center;
 }
 
-/* フィルター部分のレイアウト */
+/* フィルター部分全体の位置調整 */
 .filter {
     display: flex;
-    align-items: flex-start; /* 上部揃え */
-    gap: 15px; /* フィルター間の間隔 */
+    align-items: flex-start;
+    gap: 15px;
+    height: 100%; /* 高さを親要素に合わせる */
 }
 
-/* 属性フィルターのスタイル */
-.filter-group {
+/* 属性フィルターとカテゴリフィルターのラベルを統一 */
+.filter-label, .category-filter-header {
+    color: #e0e0e0;
+    font-size: 0.75rem;
+    margin-bottom: 6px;
+    height: 16px; /* 高さを固定 */
+    line-height: 16px; /* 行の高さも合わせる */
+}
+
+/* フィルターグループ全体の配置を調整 */
+.filter-group, .category-filter-container {
     display: flex;
     flex-direction: column;
-    min-width: 150px;
+    background-color: #1a1a1a;
+    padding: 8px;
+    border-radius: 4px;
 }
 
-.filter-label {
-    color: #e0e0e0;
-    font-size: 0.85rem;
-    margin-bottom: 6px;
+/* フィルターグループの内部配置を調整 */
+.filter-group select, .category-filter-group {
+    margin-top: 0; /* 上部マージンを削除 */
 }
 
 #attribution-filter {
@@ -97,23 +108,10 @@ h1 {
     background-color: #2a2a2a;
     color: #e0e0e0;
     border: 1px solid #333;
+    font-size: 0.75rem;
     padding: 0.5rem;
     border-radius: 4px;
-    margin-left: 0.5rem;
-}
-
-/* カテゴリフィルターのスタイル */
-.category-filter-container {
-    background-color: #1a1a1a;
-    border-radius: 4px;
-    padding: 8px;
-    position: relative;
-}
-
-.category-filter-header {
-    color: #e0e0e0;
-    font-size: 0.85rem;
-    margin-bottom: 6px;
+    margin-left: 0; /* 左マージンを削除 */
 }
 
 .category-filter-group {
