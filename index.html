@@ -30,16 +30,6 @@
         <option value="videographer">映像作家</option>
         <option value="musician">音楽家</option>
     </select>
-    <select id="filter-select">
-        <option value="all">すべての項目</option>
-        <option value="building">建築作品</option>
-        <option value="publication">出版物</option>
-        <option value="essay">論考</option>
-        <option value="artwork">芸術作品</option>
-        <option value="exhibition">展覧会</option>
-        <option value="manifesto">宣言</option>
-        <option value="award">受賞</option>
-    </select>
 
     <!-- ドロップダウンからチェックボックスグループに変更 -->
     <div class="category-filter-container">
@@ -64,6 +54,14 @@
             <label class="category-filter-item">
                 <input type="checkbox" name="category-filter" value="exhibition" checked>
                 <span class="event-type event-exhibition">展覧会</span>
+            </label>
+            <label class="category-filter-item">
+                <input type="checkbox" name="category-filter" value="manifesto" checked>
+                <span class="event-type event-manifesto">宣言</span>
+            </label>
+            <label class="category-filter-item">
+                <input type="checkbox" name="category-filter" value="award" checked>
+                <span class="event-type event-award">受賞</span>
             </label>
             <!-- 新しいカテゴリをここに追加 -->
         </div>

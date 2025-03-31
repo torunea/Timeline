@@ -67,7 +67,6 @@ h1 {
     align-items: center;
 }
 
-/* チェックボックスに変更したため不要
 #filter-select, #attribution-filter {
     background-color: #2a2a2a;
     color: #e0e0e0;
@@ -76,7 +75,6 @@ h1 {
     border-radius: 4px;
     margin-left: 0.5rem;
 }
-*/
 
 /* カテゴリフィルターのスタイル */
 .category-filter-container {
