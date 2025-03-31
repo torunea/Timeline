@@ -124,10 +124,10 @@ function processData(data) {
 // 年表の描画
 function renderTimeline(persons, birthDeathInfo) {
     const timelineElement = document.getElementById('timeline');
-    const personListElement = document.getElementById('person-list');
+    // person-listの参照を削除
     
     timelineElement.innerHTML = '';
-    personListElement.innerHTML = '';
+    // person-listのクリア処理を削除
     
     // 年マーカーのヘッダーを作成
     const timelineHeader = document.createElement('div');
@@ -149,21 +149,7 @@ function renderTimeline(persons, birthDeathInfo) {
         const items = persons[personName];
         const bdInfo = birthDeathInfo[personName] || {};
         
-        // 人物リストに名前を追加
-        const nameItem = document.createElement('div');
-        nameItem.className = 'person-item';
-        nameItem.textContent = personName;
-        
-        // 属性を表示（小さく）
-        if (bdInfo.attribution) {
-            const attributionSpan = document.createElement('small');
-            attributionSpan.style.fontSize = '0.7rem';
-            attributionSpan.style.color = '#808080';
-            attributionSpan.textContent = getAttributionLabel(bdInfo.attribution);
-            nameItem.appendChild(attributionSpan);
-        }
-        
-        personListElement.appendChild(nameItem);
+        // 人物リストへの追加を削除
         
         // 人物のタイムライン行
         const personRow = document.createElement('div');
@@ -173,6 +159,21 @@ function renderTimeline(persons, birthDeathInfo) {
         if (bdInfo.attribution) {
             personRow.setAttribute('data-attribution', bdInfo.attribution);
         }
+        
+        // 人物名を帯の左端に追加 (新規追加)
+        const nameElement = document.createElement('div');
+        nameElement.className = 'person-name';
+        nameElement.textContent = personName;
+        
+        // 属性を表示（小さく）
+        if (bdInfo.attribution) {
+            const attributionSpan = document.createElement('div');
+            attributionSpan.className = 'person-attribution';
+            attributionSpan.textContent = getAttributionLabel(bdInfo.attribution);
+            nameElement.appendChild(attributionSpan);
+        }
+        
+        personRow.appendChild(nameElement);
         
         // 人物のタイムライン
         const timelineContainer = document.createElement('div');
