@@ -381,9 +381,18 @@ h1 {
     margin-top: 5px;
 }
 
-/* ホバー時に説明文を表示 */
+/* ホバー時にイベントアイテムを最前面に表示 */
+.event-group-item:hover {
+    position: relative;
+    z-index: 200; /* 非常に高い値を設定して最前面に */
+    background-color: #333; /* 背景色を少し濃くして選択中であることを示す */
+}
+
+/* ホバー時の説明文のスタイル強化 */
 .event-group-item:hover .event-description {
     display: block;
+    position: relative; /* 位置指定を有効に */
+    z-index: 201; /* イベントアイテムより更に前面に */
 }
 
 /* 展開インジケーター */
