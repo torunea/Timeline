@@ -142,17 +142,16 @@ h1 {
     color: #b0b0b0;
 }
 
-/* 人物名も固定表示するために必要なスタイル */
 .person-row {
     position: relative;
     margin-bottom: 1rem;
     min-height: 80px;
 }
 
-/* 人物名のスタイル - 左側に固定 */
+/* 人物名のスタイル - 帯の左端に表示 */
 .person-name {
-    position: sticky;
-    left: 20px; /* 左端からの距離 */
+    position: absolute;
+    left: -180px; /* 帯の左側に配置 */
     width: 170px;
     text-align: right;
     padding-right: 1rem;
@@ -164,9 +163,6 @@ h1 {
     flex-direction: column;
     justify-content: flex-start;
     top: 0;
-    background-color: rgba(18, 18, 18, 0.9); /* 背景色を少し透過させる */
-    padding: 5px;
-    border-radius: 4px;
 }
 
 /* 属性ラベルのスタイル */
