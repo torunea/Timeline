@@ -196,7 +196,7 @@ h1 {
     position: absolute;
     margin-left: -150px; /* 微妙に合わないので150pxズラして調整 */
     top: 0;
-    width: 100px;
+    width: 200px;
     background-color: #2a2a2a;
     border: 1px solid #444;
     border-radius: 4px;
@@ -258,7 +258,7 @@ h1 {
     position: absolute;
     margin-left: -150px; /* 微妙に合わないので150pxズラして調整 */
     top: 0;
-    width: 100px;
+    width: 200px;
     background-color: #2a2a2a;
     border: 1px solid #444;
     border-radius: 4px;
