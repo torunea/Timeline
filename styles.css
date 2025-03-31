@@ -43,7 +43,7 @@ h1 {
     align-items: center;
 }
 
-select#search-type {
+.controls .search select#search-type {
     background-color: #2a2a2a;
     color: #e0e0e0;
     border: 1px solid #333;
