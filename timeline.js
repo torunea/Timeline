@@ -294,7 +294,7 @@ function renderTimeline(persons, birthDeathInfo) {
                         const descElement = document.createElement('div');
                         descElement.className = 'event-description';
                         descElement.textContent = item.description;
-                        descElement.style.display = 'none'; // 初期状態では非表示
+                        // display: none を設定しない（CSSに任せる）
                         eventItem.appendChild(descElement);
                     }
                     
