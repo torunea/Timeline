@@ -367,7 +367,7 @@ h1 {
 
 .event-group.expanded .event-group-content {
     display: block;
-    /* max-heightを削除　十分な高さを確保 */
+    max-height: 600px;/* 十分な高さを確保 */
     overflow-y: auto; /* スクロール可能にする */
     background-color: #2a2a2a;
     border-radius: 0 0 4px 4px;
