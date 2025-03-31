@@ -323,6 +323,14 @@ h1 {
     background-color: #01579b;
 }
 
+.badge-manifesto {
+    background-color: #00796b;
+}
+
+.badge-award {
+    background-color: #c2185b;
+}
+
 /* イベントグループのスタイル */
 .event-group {
     position: absolute;

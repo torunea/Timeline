@@ -32,7 +32,9 @@ function getCategoryLabel(category) {
         'publication': '出版物',
         'essay': '論考',
         'artwork': '芸術作品',
-        'exhibition': '展覧会'
+        'exhibition': '展覧会',
+        'manifesto': '宣言',
+        'award': '受賞',
     };
     return labels[category] || category;
 }
