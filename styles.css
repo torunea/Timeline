@@ -67,6 +67,7 @@ h1 {
     align-items: center;
 }
 
+/* チェックボックスに変更したため不要
 #filter-select, #attribution-filter {
     background-color: #2a2a2a;
     color: #e0e0e0;
@@ -74,6 +75,71 @@ h1 {
     padding: 0.5rem;
     border-radius: 4px;
     margin-left: 0.5rem;
+}
+*/
+
+/* カテゴリフィルターのスタイル */
+.category-filter-container {
+    background-color: #1a1a1a;
+    border-radius: 4px;
+    padding: 8px;
+    margin-left: 0.5rem;
+    position: relative;
+}
+
+.category-filter-header {
+    color: #e0e0e0;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+}
+
+.category-filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.category-filter-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.category-filter-item input[type="checkbox"] {
+    margin-right: 4px;
+    cursor: pointer;
+}
+
+/* チェックボックスのカスタムスタイル */
+.category-filter-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 3px;
+    position: relative;
+}
+
+.category-filter-item input[type="checkbox"]:checked::after {
+    content: "✓";
+    font-size: 12px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #e0e0e0;
+}
+
+.category-filter-item input[type="checkbox"]:hover {
+    background-color: #333;
+}
+
+/* タイプラベルを小さくする */
+.category-filter-item .event-type {
+    font-size: 0.75rem;
+    padding: 2px 6px;
 }
 
 .container {

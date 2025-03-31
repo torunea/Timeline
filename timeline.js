@@ -334,22 +334,25 @@ function renderTimeline(persons, birthDeathInfo) {
     });
 }
 
-// フィルタと検索機能のセットアップ
+// フィルタリング関数を変更
 function setupFilters(data, persons, birthDeathInfo) {
     const searchBox = document.getElementById('search-box');
-    const filterSelect = document.getElementById('filter-select');
     const attributionFilter = document.getElementById('attribution-filter');
-    // 検索タイプの選択要素を追加
     const searchTypeSelect = document.getElementById('search-type');
+    const categoryCheckboxes = document.querySelectorAll('input[name="category-filter"]');
     
     // フィルタリング関数
     function applyFilters() {
         const searchTerm = searchBox.value.toLowerCase().trim();
-        const selectedCategory = filterSelect.value;
         const selectedAttribution = attributionFilter.value;
-        const searchType = searchTypeSelect ? searchTypeSelect.value : 'or'; // デフォルトはOR検索
+        const searchType = searchTypeSelect ? searchTypeSelect.value : 'or';
         
-        // 検索語を分割（空白で区切る）
+        // 選択されたカテゴリを配列として取得
+        const selectedCategories = Array.from(categoryCheckboxes)
+            .filter(checkbox => checkbox.checked)
+            .map(checkbox => checkbox.value);
+        
+        // 検索語を分割
         const searchTerms = searchTerm.split(/\s+/).filter(term => term.length > 0);
         
         // 絞り込みデータを作成
@@ -412,41 +415,45 @@ function setupFilters(data, persons, birthDeathInfo) {
                 }
             }
             
-            // カテゴリでフィルタリング
-            if (selectedCategory !== 'all') {
-                const filteredItems = persons[personName].filter(item => 
-                    item.category === selectedCategory || item.category === 'birth' || item.category === 'death'
-                );
-                
-                if (filteredItems.filter(item => item.category === selectedCategory).length === 0) {
-                    // 選択されたカテゴリに一致するアイテムがない場合はスキップ
-                    return;
-                }
-                
-                filteredPersons[personName] = filteredItems;
-            } else {
-                filteredPersons[personName] = persons[personName];
+            // カテゴリでフィルタリング（複数選択に対応）
+            // 選択されたカテゴリのいずれかに一致するイベントをフィルタリング
+            const filteredItems = persons[personName].filter(item => 
+                selectedCategories.includes(item.category) || item.category === 'birth' || item.category === 'death'
+            );
+            
+            // 選択されたカテゴリのいずれかに一致するイベントがない場合はスキップ
+            const hasMatchingCategory = filteredItems.some(item => 
+                selectedCategories.includes(item.category)
+            );
+            
+            if (!hasMatchingCategory && selectedCategories.length > 0) {
+                return;
             }
+            
+            filteredPersons[personName] = filteredItems;
         });
         
         // 絞り込み結果で年表を再描画
         renderTimeline(filteredPersons, birthDeathInfo);
     }
     
-    // 検索機能
+    // 検索機能のイベントリスナー（既存のコードと同じ）
     searchBox.addEventListener('input', applyFilters);
     
-    // カテゴリフィルタ
-    filterSelect.addEventListener('change', applyFilters);
-    
-    // 属性フィルタ
+    // 属性フィルタのイベントリスナー（既存のコードと同じ）
     attributionFilter.addEventListener('change', applyFilters);
     
-    // 検索タイプ切り替え
+    // 検索タイプのイベントリスナー（既存のコードと同じ）
     if (searchTypeSelect) {
         searchTypeSelect.addEventListener('change', applyFilters);
     }
+    
+    // カテゴリフィルタのイベントリスナー（新規追加）
+    categoryCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', applyFilters);
+    });
 }
+
 
 // ページ読み込み時にデータを取得
 document.addEventListener('DOMContentLoaded', loadData);
