@@ -19,17 +19,22 @@
         <option value="and">AND検索</option>
     </select>
 </div>
+
 <div class="filter">
-    <select id="attribution-filter">
-        <option value="all">すべての属性</option>
-        <option value="architect">建築家</option>
-        <option value="artist">芸術家</option>
-        <option value="writer">作家</option>
-        <option value="critic">批評家</option>
-        <option value="philosopher">哲学者</option>
-        <option value="videographer">映像作家</option>
-        <option value="musician">音楽家</option>
-    </select>
+    <!-- 属性フィルターをカテゴリフィルターの前に配置 -->
+    <div class="filter-group">
+        <div class="filter-label">属性:</div>
+        <select id="attribution-filter">
+            <option value="all">すべての属性</option>
+            <option value="architect">建築家</option>
+            <option value="artist">芸術家</option>
+            <option value="writer">作家</option>
+            <option value="critic">批評家</option>
+            <option value="philosopher">哲学者</option>
+            <option value="videographer">映像作家</option>
+            <option value="musician">音楽家</option>
+        </select>
+    </div>
 
     <!-- ドロップダウンからチェックボックスグループに変更 -->
     <div class="category-filter-container">
@@ -67,7 +72,7 @@
         </div>
     </div>
 </div>
-</div>
+
 
 <div class="container">
 <div class="timeline-scroll">
