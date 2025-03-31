@@ -345,7 +345,6 @@ h1 {
 /* グループ内の各イベントアイテム */
 .event-group-item {
     padding: 0.5rem;
-    font-size: 0.8rem;
     border-bottom: 1px dotted #444;
     margin-bottom: 0.5rem;
 }
@@ -367,6 +366,7 @@ h1 {
 /* グループ内のイベントタイトル */
 .event-group-item .event-title {
     font-weight: bold;
+    font-size: 0.8rem;
     margin-bottom: 3px;
     color: #ffffff;
 }
