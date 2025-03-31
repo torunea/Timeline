@@ -260,6 +260,7 @@ function renderTimeline(persons, birthDeathInfo) {
                 const groupElement = document.createElement('div');
                 groupElement.className = 'event-group';
                 groupElement.style.left = position + 'px';
+                groupElement.style.width = PIXELS_PER_YEAR + 'px'; //複数イベント時の幅調整ここ？（追加）
                 
                 // ヘッダー（件数を表示）
                 const headerElement = document.createElement('div');
