@@ -282,6 +282,16 @@ h1 {
     color: #81d4fa;
 }
 
+.event-manifesto {
+    background-color: #00796b;
+    color: #b2dfdb;
+}
+
+.event-award {
+    background-color: #c2185b;
+    color: #f8bbd0;
+}
+
 .event-title {
     font-weight: bold;
     margin-bottom: 3px;
