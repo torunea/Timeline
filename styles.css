@@ -43,13 +43,28 @@ h1 {
     align-items: center;
 }
 
+#search-type {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+}
+
+/* 検索ボックスのサイズを少し小さくして検索タイプと並べる */
 .search-box {
     padding: 0.5rem;
-    width: 250px;
+    width: 200px;
     border: 1px solid #333;
     border-radius: 4px;
     background-color: #2a2a2a;
     color: #e0e0e0;
+}
+
+.search {
+    display: flex;
+    align-items: center;
 }
 
 #filter-select, #attribution-filter {

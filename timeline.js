@@ -323,29 +323,69 @@ function setupFilters(data, persons, birthDeathInfo) {
     const searchBox = document.getElementById('search-box');
     const filterSelect = document.getElementById('filter-select');
     const attributionFilter = document.getElementById('attribution-filter');
+    // 検索タイプの選択要素を追加
+    const searchTypeSelect = document.getElementById('search-type');
     
     // フィルタリング関数
     function applyFilters() {
-        const searchTerm = searchBox.value.toLowerCase();
+        const searchTerm = searchBox.value.toLowerCase().trim();
         const selectedCategory = filterSelect.value;
         const selectedAttribution = attributionFilter.value;
+        const searchType = searchTypeSelect ? searchTypeSelect.value : 'or'; // デフォルトはOR検索
+        
+        // 検索語を分割（空白で区切る）
+        const searchTerms = searchTerm.split(/\s+/).filter(term => term.length > 0);
         
         // 絞り込みデータを作成
         const filteredPersons = {};
         
         Object.keys(persons).forEach(personName => {
             // 名前による検索
-            if (searchTerm && !personName.toLowerCase().includes(searchTerm)) {
-                // 名前が検索語に含まれない場合は、タイトルや説明で検索
-                const matchingItems = persons[personName].filter(item => 
-                    (item.title && item.title.toLowerCase().includes(searchTerm)) ||
-                    (item.description && item.description.toLowerCase().includes(searchTerm))
-                );
-                
-                if (matchingItems.length === 0) {
-                    // 名前もタイトルも説明も検索語に含まれない場合はスキップ
-                    return;
+            let nameMatches = false;
+            let itemMatches = false;
+            
+            // 検索語がない場合は一致とみなす
+            if (searchTerms.length === 0) {
+                nameMatches = true;
+            } else {
+                // 名前に対する検索
+                if (searchType === 'and') {
+                    // AND検索: すべての検索語が名前に含まれる必要がある
+                    nameMatches = searchTerms.every(term => 
+                        personName.toLowerCase().includes(term)
+                    );
+                } else {
+                    // OR検索: いずれかの検索語が名前に含まれればOK
+                    nameMatches = searchTerms.some(term => 
+                        personName.toLowerCase().includes(term)
+                    );
                 }
+                
+                // 名前に一致しない場合はイベントで検索
+                if (!nameMatches) {
+                    const matchingItems = persons[personName].filter(item => {
+                        if (searchType === 'and') {
+                            // AND検索: すべての検索語がタイトルまたは説明に含まれる必要がある
+                            return searchTerms.every(term => 
+                                (item.title && item.title.toLowerCase().includes(term)) ||
+                                (item.description && item.description.toLowerCase().includes(term))
+                            );
+                        } else {
+                            // OR検索: いずれかの検索語がタイトルまたは説明に含まれればOK
+                            return searchTerms.some(term => 
+                                (item.title && item.title.toLowerCase().includes(term)) ||
+                                (item.description && item.description.toLowerCase().includes(term))
+                            );
+                        }
+                    });
+                    
+                    itemMatches = matchingItems.length > 0;
+                }
+            }
+            
+            // 検索条件に一致しない場合はスキップ
+            if (searchTerms.length > 0 && !nameMatches && !itemMatches) {
+                return;
             }
             
             // 属性でフィルタリング
@@ -385,6 +425,11 @@ function setupFilters(data, persons, birthDeathInfo) {
     
     // 属性フィルタ
     attributionFilter.addEventListener('change', applyFilters);
+    
+    // 検索タイプ切り替え
+    if (searchTypeSelect) {
+        searchTypeSelect.addEventListener('change', applyFilters);
+    }
 }
 
 // ページ読み込み時にデータを取得
