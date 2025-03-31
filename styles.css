@@ -371,13 +371,19 @@ h1 {
     color: #ffffff;
 }
 
-/* グループ内の説明 */
+/* グループ内の説明（ホバーで表示） */
 .event-group-item .event-description {
+    display: none; /* 最初は非表示 */
     font-size: 0.7rem;
     color: #a0a0a0;
     padding-top: 5px;
     border-top: 1px dotted #444;
     margin-top: 5px;
+}
+
+/* ホバー時に説明文を表示 */
+.event-group-item:hover .event-description {
+    display: block;
 }
 
 /* 展開インジケーター */

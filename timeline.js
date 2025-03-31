@@ -289,12 +289,12 @@ function renderTimeline(persons, birthDeathInfo) {
                     titleElement.textContent = item.title;
                     eventItem.appendChild(titleElement);
                     
-                    // 説明
+                    // 説明（ホバー時のみ表示に変更）
                     if (item.description) {
                         const descElement = document.createElement('div');
                         descElement.className = 'event-description';
                         descElement.textContent = item.description;
-                        descElement.style.display = 'block'; // アコーディオン内では常に表示
+                        descElement.style.display = 'none'; // 初期状態では非表示
                         eventItem.appendChild(descElement);
                     }
                     
