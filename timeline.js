@@ -1036,6 +1036,27 @@ function setupZoom() {
     });
 }
 
+// 拡大縮小後にタイムラインを完全に再描画
+function rebuildTimelineAfterZoom() {
+    // 現在のデータと状態を保存
+    const currentData = window.currentPersons;
+    const currentFilters = {
+        searchTerm: document.getElementById('search-box').value,
+        attribution: document.getElementById('attribution-filter').value,
+        categories: Array.from(document.querySelectorAll('input[name="category-filter"]:checked'))
+            .map(checkbox => checkbox.value)
+    };
+    
+    // タイムラインを再描画
+    renderTimeline(currentData, window.birthDeathInfo);
+    
+    // フィルタを再適用
+    // ...（フィルタロジック）
+    
+    // 接続線を再描画
+    connectRelatedEvents(currentData);
+}
+
 // ページ読み込み時の処理に追加
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
