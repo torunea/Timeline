@@ -241,9 +241,11 @@ h1 {
 /* イベントボックスのサイズを安定させるためのCSS */
 .event-item, .event-group {
     box-sizing: border-box !important;
-    width: var(--pixels-per-year, 200px) !important; /* デフォルト幅を変数で設定 */
-    min-width: var(--pixels-per-year, 200px) !important;
+    width: 200px !important; /* 固定値でシンプルに */
+    min-width: 200px !important;
     transform-origin: left top !important;
+    position: absolute; /* 位置を明示的に指定 */
+    margin-left: -150px; /* 標準のオフセット */
 }
 
 /* ズーム時のスタイル */
@@ -251,6 +253,24 @@ h1 {
 .timeline.zoomed .event-group {
     /* タイムライン全体のtransformが効くので、個別の要素はtransformしない */
     transform: none !important;
+}
+
+/* イベントボックスのスタイル - 基本設定と位置の安定化 */
+.event-item, .event-group {
+    position: absolute;
+    margin-left: -150px; /* 標準のオフセット */
+    width: 200px !important; /* PIXELS_PER_YEARと同じ値 */
+    min-width: 200px !important;
+    box-sizing: border-box !important;
+    transform-origin: left top !important;
+}
+
+/* 拡大縮小時のスタイル - 個別の位置計算を防止 */
+.timeline.zoomed .event-item,
+.timeline.zoomed .event-group,
+.timeline.zoomed .person-lifespan {
+    /* タイムライン全体のtransformのみを使用 */
+    transform: none !important; 
 }
 
 /* タイムラインヘッダー（年の表示）を画面上部に固定 */

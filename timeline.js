@@ -265,8 +265,7 @@ function renderTimeline(persons, birthDeathInfo) {
                 const eventId = `event-${personName}-${year}-${Math.random().toString(36).substr(2, 5)}`;
                 eventElement.setAttribute('data-event-id', eventId);
                 
-                eventElement.style.left = position + 'px';
-                eventElement.style.width = PIXELS_PER_YEAR + 'px';
+                setCorrectEventPosition(eventElement, year);
                 // オリジナルサイズを保存（拡大縮小用）
                 eventElement.setAttribute('data-original-width', PIXELS_PER_YEAR + 'px');
                 
@@ -300,8 +299,7 @@ function renderTimeline(persons, birthDeathInfo) {
                 const groupId = `group-${personName}-${year}-${Math.random().toString(36).substr(2, 5)}`;
                 groupElement.setAttribute('data-event-id', groupId);
                 
-                groupElement.style.left = position + 'px';
-                groupElement.style.width = PIXELS_PER_YEAR + 'px';
+                setCorrectEventPosition(groupElement, year);
                 // オリジナルサイズを保存（拡大縮小用）
                 groupElement.setAttribute('data-original-width', PIXELS_PER_YEAR + 'px');
                 groupElement.setAttribute('data-year', year); // 年を記録
@@ -418,6 +416,16 @@ setupAccordion();
 connectRelatedEvents(persons);
 }
 
+// イベント要素の作成時に正確な位置を設定
+function setCorrectEventPosition(element, year) {
+    const position = (year - START_YEAR) * PIXELS_PER_YEAR;
+    element.style.left = position + 'px';
+    element.style.width = PIXELS_PER_YEAR + 'px';
+    // position属性を追加して元の位置を記録
+    element.setAttribute('data-original-position', position);
+    element.setAttribute('data-original-width', PIXELS_PER_YEAR);
+}
+
 // ズームに応じて年マーカーの幅を更新する関数
 function updateYearMarkersWidth(zoomLevel) {
     const yearMarkers = document.querySelectorAll('.year-marker');
@@ -431,42 +439,11 @@ function updateYearMarkersWidth(zoomLevel) {
     updateEventPositions(zoomLevel);
 }
 
-// ズームに応じてイベント要素の位置を更新する関数
+// ズームに応じてイベント要素の位置を更新する関数を修正
 function updateEventPositions(zoomLevel) {
-    // 帯の位置と幅を更新
-    const lifespanElements = document.querySelectorAll('.person-lifespan');
-    lifespanElements.forEach(element => {
-        const birthYear = parseInt(element.getAttribute('data-birth-year'));
-        const deathYear = parseInt(element.getAttribute('data-death-year'));
-        
-        const startPosition = Math.max(0, (birthYear - START_YEAR) * PIXELS_PER_YEAR * zoomLevel);
-        const endPosition = Math.min((END_YEAR - START_YEAR) * PIXELS_PER_YEAR * zoomLevel, 
-                                   (deathYear - START_YEAR) * PIXELS_PER_YEAR * zoomLevel);
-        const width = endPosition - startPosition;
-        
-        element.style.left = startPosition + 'px';
-        element.style.width = width + 'px';
-    });
-    
-    // 単一イベントの位置と幅を更新
-    const eventElements = document.querySelectorAll('.event-item');
-    eventElements.forEach(element => {
-        const year = parseInt(element.getAttribute('data-year'));
-        const position = (year - START_YEAR) * PIXELS_PER_YEAR * zoomLevel;
-        
-        element.style.left = position + 'px';
-        element.style.width = (PIXELS_PER_YEAR * zoomLevel) + 'px';
-    });
-    
-    // 複数イベントグループの位置と幅を更新
-    const groupElements = document.querySelectorAll('.event-group');
-    groupElements.forEach(element => {
-        const year = parseInt(element.getAttribute('data-year'));
-        const position = (year - START_YEAR) * PIXELS_PER_YEAR * zoomLevel;
-        
-        element.style.left = position + 'px';
-        element.style.width = (PIXELS_PER_YEAR * zoomLevel) + 'px';
-    });
+    // この関数は使わない - transformを使用する方式に切り替えるため
+    // ただし、後方互換性のために関数は残しておく
+    console.log("Using CSS transform for zooming instead of manual positioning");
 }
 
 // フィルタリング関数を変更
@@ -584,9 +561,9 @@ function setupFilters(data, persons, birthDeathInfo) {
         // 絞り込み結果で年表を再描画
         renderTimeline(filteredPersons, birthDeathInfo);
         
-        // フィルタリング結果をグローバル変数に保存
+        // グローバル変数に保存
         window.currentPersons = filteredPersons;
-        window.birthDeathInfo = birthDeathInfo;  // 生没年情報も保存
+        window.birthDeathInfo = birthDeathInfo;
         
         // フィルタリング後、アコーディオンの状態をリセット
         const allGroups = document.querySelectorAll('.event-group');
@@ -594,20 +571,17 @@ function setupFilters(data, persons, birthDeathInfo) {
             group.classList.remove('expanded');
         });
         
-        // ズームレベルを再適用（フィルタリング後）
+        // ズームレベルを再適用（位置計算はCSS transformだけで行う）
         if (currentZoom !== 1) {
             const timeline = document.getElementById('timeline');
             timeline.style.transform = `scale(${currentZoom})`;
             timeline.style.transformOrigin = 'left top';
             timeline.classList.add('zoomed');
-            
-            // イベントボックスのサイズを正規化する
-            normalizeEventBoxSizes();
         }
         
-        // 線を再描画（1回だけ実行）
+        // 線を再描画（少し遅らせる）
         setTimeout(() => {
-            clearConnectionLines();  // 既存の線を確実に削除
+            clearConnectionLines();
             connectRelatedEvents(filteredPersons);
         }, 100);
     }
@@ -642,6 +616,17 @@ function setupFilters(data, persons, birthDeathInfo) {
     categoryCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', applyFilters);
     });
+}
+
+// イベント要素の作成時に正確な位置を設定
+// renderTimelineの中のイベント作成部分で使用
+function setCorrectEventPosition(element, year) {
+    const position = (year - START_YEAR) * PIXELS_PER_YEAR;
+    element.style.left = position + 'px';
+    element.style.width = PIXELS_PER_YEAR + 'px';
+    // position属性を追加して元の位置を記録
+    element.setAttribute('data-original-position', position);
+    element.setAttribute('data-original-width', PIXELS_PER_YEAR);
 }
 
 // イベント間の関連性を検出して線を引く関数
@@ -882,19 +867,16 @@ function drawConnectionLine(sourceEvent, targetEvent, sourceCollapsed, targetCol
     // 線を描画するコンテナ
     const container = document.querySelector('.timeline');
     
-    // 現在のズームレベルを取得
+    // ズームレベルの取得
     const zoomLevelDisplay = document.getElementById('zoom-level');
     const zoomLevel = parseFloat(zoomLevelDisplay.textContent) / 100 || 1;
     
-    // イベント要素の位置を取得
-    const sourceRect = sourceEvent.getBoundingClientRect();
-    const targetRect = targetEvent.getBoundingClientRect();
+    // 位置計算を絶対座標に基づいて行う
+    sourceX = (sourceRect.left - containerRect.left) / zoomLevel + sourceRect.width / (2 * zoomLevel);
+    sourceY = (sourceRect.top - containerRect.top) / zoomLevel + sourceRect.height / (2 * zoomLevel);
     
-    // タイムラインコンテナを基準にした相対位置を計算
-    const containerRect = container.getBoundingClientRect();
-    
-    // 折りたたまれたグループ内のアイテムの場合、表示されていない可能性があるため
-    // グループ自体の位置を使用する
+    targetX = (targetRect.left - containerRect.left) / zoomLevel + targetRect.width / (2 * zoomLevel);
+    targetY = (targetRect.top - containerRect.top) / zoomLevel + targetRect.height / (2 * zoomLevel);
     
     // ソースの接続ポイントを計算
     let sourceX, sourceY;
@@ -1029,33 +1011,25 @@ function setupZoom() {
     const maxZoom = 2; // 最大ズーム
     const minZoom = 0.5; // 最小ズーム
     
-    // ズームレベルを適用する関数
+    // 拡大縮小時にタイムラインを変換する
     function applyZoom() {
         // ズームレベルを表示
         zoomLevelDisplay.textContent = `${Math.round(zoomLevel * 100)}%`;
         
-        // タイムライン全体のズーム設定
+        // タイムライン全体のズーム設定だけを行う
         timeline.style.transform = `scale(${zoomLevel})`;
         timeline.style.transformOrigin = 'left top'; // 基準点を左上に固定
         timeline.classList.toggle('zoomed', zoomLevel !== 1);
         
-        // レンダリングを強制的に更新（ブラウザの再描画を促す）
-        timeline.style.display = 'none';
-        timeline.offsetHeight; // 強制的なレイアウト計算を発生させる
-        timeline.style.display = '';
-        
-        // 接続線を全て削除
+        // 線をクリアして再描画
         clearConnectionLines();
         
-        // 再描画をスケジュール（少し遅延させる）
-        if (window.redrawTimeoutId) {
-            clearTimeout(window.redrawTimeoutId);
-        }
-        window.redrawTimeoutId = setTimeout(() => {
+        // 接続線を再描画
+        setTimeout(() => {
             if (window.currentPersons) {
                 connectRelatedEvents(window.currentPersons);
             }
-        }, 50); // 50ms遅延させる
+        }, 50);
     }
     
     // ズームイン
