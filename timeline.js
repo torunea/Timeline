@@ -346,6 +346,21 @@ function renderTimeline(persons, birthDeathInfo) {
             updateYearMarkersWidth(currentZoom);
         }
     }
+
+// グローバル変数として現在の persons データを保存
+window.currentPersons = persons;
+
+// イベントにユニークIDを付与（既存コードに追加）
+const allEvents = document.querySelectorAll('.event-item, .event-group-item');
+allEvents.forEach((event, index) => {
+    event.setAttribute('data-event-id', `event-${index}`);
+});
+
+// アコーディオン設定
+setupAccordion();
+
+// 関連イベント間の線を描画
+connectRelatedEvents(persons);
 }
 
 // ズームに応じて年マーカーの幅を更新する関数
@@ -500,6 +515,14 @@ function setupFilters(data, persons, birthDeathInfo) {
         
         // 絞り込み結果で年表を再描画
         renderTimeline(filteredPersons, birthDeathInfo);
+
+        // フィルタリング結果をグローバル変数に保存
+        window.currentPersons = filteredPersons;
+
+        // フィルタリング後、線を再描画するためのタイムアウト設定
+        setTimeout(() => {
+            connectRelatedEvents(window.currentPersons);
+        }, 100);
     }
     
     // 検索機能のイベントリスナー（既存のコードと同じ）
@@ -516,6 +539,209 @@ function setupFilters(data, persons, birthDeathInfo) {
     // カテゴリフィルタのイベントリスナー（新規追加）
     categoryCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', applyFilters);
+    });
+}
+
+// イベント間の関連性を検出して線を引く関数
+function connectRelatedEvents(persons) {
+    // 先にすべてのイベント要素の辞書を作成（title → 要素のマップ）
+    const eventsByTitle = new Map();
+    
+    // 単一イベントと展開されたグループ内のイベントを収集
+    const allEvents = document.querySelectorAll('.event-item, .event-group-item');
+    
+    allEvents.forEach(eventElement => {
+        const titleElement = eventElement.querySelector('.event-title');
+        if (titleElement) {
+            const title = titleElement.textContent.trim();
+            if (!eventsByTitle.has(title)) {
+                eventsByTitle.set(title, []);
+            }
+            eventsByTitle.get(title).push(eventElement);
+        }
+    });
+    
+    // 折りたたまれたイベントグループも収集
+    const collapsedGroups = document.querySelectorAll('.event-group:not(.expanded)');
+    collapsedGroups.forEach(group => {
+        // グループ内のイベントのタイトルを取得
+        const groupItems = group.querySelectorAll('.event-group-item');
+        groupItems.forEach(item => {
+            const titleElement = item.querySelector('.event-title');
+            if (titleElement) {
+                const title = titleElement.textContent.trim();
+                if (!eventsByTitle.has(title)) {
+                    eventsByTitle.set(title, []);
+                }
+                // 折りたたまれたグループ全体をマッピング（アイテムではなくグループを参照）
+                eventsByTitle.get(title).push({
+                    element: group,
+                    collapsed: true,
+                    originalItem: item
+                });
+            }
+        });
+    });
+    
+    // 線の描画前に既存の線をクリア
+    clearConnectionLines();
+    
+    // 「」で囲まれた参照を検索して線を引く
+    // 単一イベントのチェック
+    allEvents.forEach(eventElement => {
+        checkAndDrawConnections(eventElement, eventsByTitle, false);
+    });
+    
+    // 折りたたまれたグループのチェック
+    collapsedGroups.forEach(group => {
+        const items = group.querySelectorAll('.event-group-item');
+        items.forEach(item => {
+            checkAndDrawConnections(item, eventsByTitle, true, group);
+        });
+    });
+}
+
+// イベント要素の説明文内の参照をチェックして線を引く関数
+function checkAndDrawConnections(eventElement, eventsByTitle, isCollapsed, groupElement = null) {
+    const descElement = eventElement.querySelector('.event-description');
+    if (!descElement) return;
+    
+    const descText = descElement.textContent;
+    // 「」で囲まれたテキストを抽出する正規表現
+    const regex = /「([^「」]+)」/g;
+    let match;
+    
+    while ((match = regex.exec(descText)) !== null) {
+        const referencedTitle = match[1].trim();
+        
+        // 参照されているタイトルのイベントを探す
+        if (eventsByTitle.has(referencedTitle)) {
+            const referencedEvents = eventsByTitle.get(referencedTitle);
+            
+            // 見つかった各イベントに対して線を引く
+            referencedEvents.forEach(targetEvent => {
+                // 自分自身は除外
+                if ((isCollapsed && targetEvent === groupElement) || 
+                    (!isCollapsed && targetEvent === eventElement) ||
+                    (isCollapsed && targetEvent.originalItem === eventElement)) {
+                    return;
+                }
+                
+                // ソース要素（折りたたまれている場合はグループ要素、そうでなければイベント要素）
+                const sourceElement = isCollapsed ? groupElement : eventElement;
+                
+                // ターゲット要素（オブジェクトの場合は element プロパティを使用）
+                const targetElement = targetEvent.element || targetEvent;
+                
+                // ターゲットが折りたたまれているかを判断
+                const targetCollapsed = targetEvent.collapsed || false;
+                
+                // 線を引く
+                drawConnectionLine(
+                    sourceElement, 
+                    targetElement, 
+                    isCollapsed, 
+                    targetCollapsed,
+                    eventElement,  // 元のイベント項目（折りたたまれている場合）
+                    targetEvent.originalItem  // ターゲットの元のイベント項目（折りたたまれている場合）
+                );
+            });
+        }
+    }
+}
+
+// 既存の接続線をすべて削除
+function clearConnectionLines() {
+    const existingLines = document.querySelectorAll('.event-connection-line');
+    existingLines.forEach(line => line.remove());
+}
+
+// 2つのイベント要素間に線を引く関数（アコーディオン状態に対応）
+function drawConnectionLine(sourceEvent, targetEvent, sourceCollapsed, targetCollapsed, originalSourceItem, originalTargetItem) {
+    // 線を描画するコンテナ
+    const container = document.querySelector('.timeline');
+    
+    // イベント要素の位置を取得
+    const sourceRect = sourceEvent.getBoundingClientRect();
+    const targetRect = targetEvent.getBoundingClientRect();
+    
+    // タイムラインコンテナを基準にした相対位置を計算
+    const containerRect = container.getBoundingClientRect();
+    
+    // ソースとターゲットの接続ポイントを計算
+    let sourceX, sourceY, targetX, targetY;
+    
+    // ソースの接続ポイント（折りたたまれているか展開されているかで切り替え）
+    if (sourceCollapsed) {
+        // 折りたたまれている場合はグループボックスの中心
+        sourceX = sourceRect.left + sourceRect.width / 2 - containerRect.left;
+        sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top;
+    } else {
+        // 展開されている場合は個別イベントの中心
+        sourceX = sourceRect.left + sourceRect.width / 2 - containerRect.left;
+        sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top;
+    }
+    
+    // ターゲットの接続ポイント（折りたたまれているか展開されているかで切り替え）
+    if (targetCollapsed) {
+        // 折りたたまれている場合はグループボックスの中心
+        targetX = targetRect.left + targetRect.width / 2 - containerRect.left;
+        targetY = targetRect.top + targetRect.height / 2 - containerRect.top;
+    } else {
+        // 展開されている場合は個別イベントの中心
+        targetX = targetRect.left + targetRect.width / 2 - containerRect.left;
+        targetY = targetRect.top + targetRect.height / 2 - containerRect.top;
+    }
+    
+    // 線要素の作成
+    const line = document.createElement('div');
+    line.className = 'event-connection-line';
+    
+    // 線のID（重複を避けるため）
+    const sourceId = sourceEvent.getAttribute('data-event-id') || Math.random().toString(36).substr(2, 9);
+    const targetId = targetEvent.getAttribute('data-event-id') || Math.random().toString(36).substr(2, 9);
+    line.setAttribute('data-connection', `${sourceId}-${targetId}`);
+    
+    // 折りたたみ状態を属性として保存（状態変更時の参照用）
+    if (sourceCollapsed) line.setAttribute('data-source-collapsed', 'true');
+    if (targetCollapsed) line.setAttribute('data-target-collapsed', 'true');
+    
+    // 元のアイテムIDを保存（折りたたみ解除時の再描画用）
+    if (originalSourceItem) line.setAttribute('data-original-source', originalSourceItem.getAttribute('data-event-id') || '');
+    if (originalTargetItem) line.setAttribute('data-original-target', originalTargetItem.getAttribute('data-event-id') || '');
+    
+    // 線の長さと角度を計算
+    const length = Math.sqrt(Math.pow(targetX - sourceX, 2) + Math.pow(targetY - sourceY, 2));
+    const angle = Math.atan2(targetY - sourceY, targetX - sourceX) * 180 / Math.PI;
+    
+    // 線のスタイル設定
+    line.style.width = `${length}px`;
+    line.style.left = `${sourceX}px`;
+    line.style.top = `${sourceY}px`;
+    line.style.transform = `rotate(${angle}deg)`;
+    
+    // 線をDOMに追加
+    container.appendChild(line);
+}
+
+// アコーディオンの展開/折りたたみイベントハンドラを修正
+function setupAccordion() {
+    const accordionHeaders = document.querySelectorAll('.event-group-header');
+    
+    accordionHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const group = header.parentElement;
+            const wasExpanded = group.classList.contains('expanded');
+            
+            // 展開/折りたたみ状態を切り替え
+            group.classList.toggle('expanded');
+            
+            // アコーディオンの状態変更後に接続線を再描画
+            setTimeout(() => {
+                // アニメーション完了後に線を再描画
+                connectRelatedEvents(currentPersons); // グローバル変数として最新のデータを保持
+            }, 300); // アコーディオンアニメーションの完了を待つ
+        });
     });
 }
 
@@ -544,6 +770,11 @@ function setupZoom() {
         
         // 個別の要素調整は行わない
         // updateYearMarkersWidth や updateEventPositions は呼び出さない
+
+        // ズーム後に線を再描画
+        if (window.currentPersons) {
+            connectRelatedEvents(window.currentPersons);
+        }
     }
     
     // ズームイン
