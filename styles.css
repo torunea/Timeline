@@ -605,6 +605,48 @@ h1 {
     scrollbar-color: #444 #1a1a1a;
 }
 
+/* ズームコントロールのスタイル */
+.zoom-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(26, 26, 26, 0.8);
+    padding: 8px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 900;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.zoom-controls button {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.zoom-controls button:hover {
+    background-color: #333;
+}
+
+#zoom-level {
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    min-width: 50px;
+    text-align: center;
+}
+
+/* ズーム時のスタイル調整 */
+.timeline.zoomed {
+    transform-origin: left top;
+}
+
 .loading {
     text-align: center;
     padding: 2rem;

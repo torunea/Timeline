@@ -124,10 +124,8 @@ function processData(data) {
 // 年表の描画
 function renderTimeline(persons, birthDeathInfo) {
     const timelineElement = document.getElementById('timeline');
-    // person-listの参照を削除
     
     timelineElement.innerHTML = '';
-    // person-listのクリア処理を削除
     
     // 年マーカーのヘッダーを作成
     const timelineHeader = document.createElement('div');
@@ -139,6 +137,7 @@ function renderTimeline(persons, birthDeathInfo) {
         yearMarker.className = 'year-marker';
         yearMarker.textContent = year;
         yearMarker.style.width = (PIXELS_PER_YEAR * YEARS_PER_MARKER) + 'px';
+        yearMarker.setAttribute('data-year', year); // 年のデータ属性を追加
         timelineHeader.appendChild(yearMarker);
     }
     
@@ -149,8 +148,6 @@ function renderTimeline(persons, birthDeathInfo) {
         const items = persons[personName];
         const bdInfo = birthDeathInfo[personName] || {};
         
-        // 人物リストへの追加を削除
-        
         // 人物のタイムライン行
         const personRow = document.createElement('div');
         personRow.className = 'person-row';
@@ -160,7 +157,7 @@ function renderTimeline(persons, birthDeathInfo) {
             personRow.setAttribute('data-attribution', bdInfo.attribution);
         }
         
-        // 人物名を帯の左端に追加 (新規追加)
+        // 人物名を帯の左端に追加
         const nameElement = document.createElement('div');
         nameElement.className = 'person-name';
         nameElement.textContent = personName;
@@ -201,6 +198,8 @@ function renderTimeline(persons, birthDeathInfo) {
             
             lifespanElement.style.left = startPosition + 'px';
             lifespanElement.style.width = width + 'px';
+            lifespanElement.setAttribute('data-birth-year', birthYear); // 生年を記録
+            lifespanElement.setAttribute('data-death-year', deathYear); // 没年を記録
             
             timelineContainer.appendChild(lifespanElement);
         }
@@ -231,6 +230,7 @@ function renderTimeline(persons, birthDeathInfo) {
                 const eventElement = document.createElement('div');
                 eventElement.className = 'event-item';
                 eventElement.setAttribute('data-category', item.category);
+                eventElement.setAttribute('data-year', year); // 年を記録
                 
                 eventElement.style.left = position + 'px';
                 eventElement.style.width = PIXELS_PER_YEAR + 'px';
@@ -262,6 +262,7 @@ function renderTimeline(persons, birthDeathInfo) {
                 groupElement.className = 'event-group';
                 groupElement.style.left = position + 'px';
                 groupElement.style.width = PIXELS_PER_YEAR + 'px';
+                groupElement.setAttribute('data-year', year); // 年を記録
 
                 // ヘッダー（カテゴリごとの件数を表示）
                 const headerElement = document.createElement('div');
@@ -292,6 +293,7 @@ function renderTimeline(persons, birthDeathInfo) {
                 events.forEach(item => {
                     const eventItem = document.createElement('div');
                     eventItem.className = 'event-group-item';
+                    eventItem.setAttribute('data-category', item.category);
                     
                     // イベント種類
                     const typeElement = document.createElement('div');
@@ -310,7 +312,6 @@ function renderTimeline(persons, birthDeathInfo) {
                         const descElement = document.createElement('div');
                         descElement.className = 'event-description';
                         descElement.textContent = item.description;
-                        // display: none を設定しない（CSSに任せる）
                         eventItem.appendChild(descElement);
                     }
                     
@@ -331,6 +332,70 @@ function renderTimeline(persons, birthDeathInfo) {
         
         personRow.appendChild(timelineContainer);
         timelineElement.appendChild(personRow);
+    });
+    
+    // 現在のズームレベルを適用（ズーム後に再描画した場合）
+    const zoomLevelDisplay = document.getElementById('zoom-level');
+    if (zoomLevelDisplay) {
+        const currentZoom = parseFloat(zoomLevelDisplay.textContent) / 100 || 1;
+        if (currentZoom !== 1) {
+            timelineElement.style.transform = `scale(${currentZoom})`;
+            timelineElement.classList.add('zoomed');
+            
+            // ズームに応じて年マーカーの幅を調整
+            updateYearMarkersWidth(currentZoom);
+        }
+    }
+}
+
+// ズームに応じて年マーカーの幅を更新する関数
+function updateYearMarkersWidth(zoomLevel) {
+    const yearMarkers = document.querySelectorAll('.year-marker');
+    yearMarkers.forEach(marker => {
+        const year = parseInt(marker.getAttribute('data-year'));
+        const years = YEARS_PER_MARKER;
+        marker.style.width = (PIXELS_PER_YEAR * years * zoomLevel) + 'px';
+    });
+    
+    // イベント要素の位置も更新
+    updateEventPositions(zoomLevel);
+}
+
+// ズームに応じてイベント要素の位置を更新する関数
+function updateEventPositions(zoomLevel) {
+    // 帯の位置と幅を更新
+    const lifespanElements = document.querySelectorAll('.person-lifespan');
+    lifespanElements.forEach(element => {
+        const birthYear = parseInt(element.getAttribute('data-birth-year'));
+        const deathYear = parseInt(element.getAttribute('data-death-year'));
+        
+        const startPosition = Math.max(0, (birthYear - START_YEAR) * PIXELS_PER_YEAR * zoomLevel);
+        const endPosition = Math.min((END_YEAR - START_YEAR) * PIXELS_PER_YEAR * zoomLevel, 
+                                   (deathYear - START_YEAR) * PIXELS_PER_YEAR * zoomLevel);
+        const width = endPosition - startPosition;
+        
+        element.style.left = startPosition + 'px';
+        element.style.width = width + 'px';
+    });
+    
+    // 単一イベントの位置と幅を更新
+    const eventElements = document.querySelectorAll('.event-item');
+    eventElements.forEach(element => {
+        const year = parseInt(element.getAttribute('data-year'));
+        const position = (year - START_YEAR) * PIXELS_PER_YEAR * zoomLevel;
+        
+        element.style.left = position + 'px';
+        element.style.width = (PIXELS_PER_YEAR * zoomLevel) + 'px';
+    });
+    
+    // 複数イベントグループの位置と幅を更新
+    const groupElements = document.querySelectorAll('.event-group');
+    groupElements.forEach(element => {
+        const year = parseInt(element.getAttribute('data-year'));
+        const position = (year - START_YEAR) * PIXELS_PER_YEAR * zoomLevel;
+        
+        element.style.left = position + 'px';
+        element.style.width = (PIXELS_PER_YEAR * zoomLevel) + 'px';
     });
 }
 
@@ -453,6 +518,83 @@ function setupFilters(data, persons, birthDeathInfo) {
         checkbox.addEventListener('change', applyFilters);
     });
 }
+
+// ズーム機能のセットアップ
+function setupZoom() {
+    const timeline = document.getElementById('timeline');
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomResetBtn = document.getElementById('zoom-reset');
+    const zoomLevelDisplay = document.getElementById('zoom-level');
+    
+    let zoomLevel = 1; // 初期ズームレベル
+    const zoomStep = 0.1; // ズーム変化量
+    const maxZoom = 2; // 最大ズーム
+    const minZoom = 0.5; // 最小ズーム
+    
+    // ズームレベルを適用する関数
+    function applyZoom() {
+        timeline.style.transform = `scale(${zoomLevel})`;
+        timeline.classList.toggle('zoomed', zoomLevel !== 1);
+        zoomLevelDisplay.textContent = `${Math.round(zoomLevel * 100)}%`;
+        
+        // ピクセル/年の値を調整（ズームに応じて調整）
+        updatePixelsPerYear();
+    }
+    
+    // PIXELS_PER_YEARの値をズームに応じて更新
+    function updatePixelsPerYear() {
+        const yearMarkers = document.querySelectorAll('.year-marker');
+        yearMarkers.forEach(marker => {
+            marker.style.width = (PIXELS_PER_YEAR * zoomLevel) + 'px';
+        });
+    }
+    
+    // ズームイン
+    zoomInBtn.addEventListener('click', () => {
+        if (zoomLevel < maxZoom) {
+            zoomLevel = Math.min(maxZoom, zoomLevel + zoomStep);
+            applyZoom();
+        }
+    });
+    
+    // ズームアウト
+    zoomOutBtn.addEventListener('click', () => {
+        if (zoomLevel > minZoom) {
+            zoomLevel = Math.max(minZoom, zoomLevel - zoomStep);
+            applyZoom();
+        }
+    });
+    
+    // リセット
+    zoomResetBtn.addEventListener('click', () => {
+        zoomLevel = 1;
+        applyZoom();
+    });
+    
+    // マウスホイールによるズーム
+    timeline.addEventListener('wheel', (e) => {
+        if (e.ctrlKey) { // Ctrlキーを押しながらホイール操作
+            e.preventDefault();
+            
+            if (e.deltaY < 0 && zoomLevel < maxZoom) {
+                // ズームイン
+                zoomLevel = Math.min(maxZoom, zoomLevel + zoomStep);
+            } else if (e.deltaY > 0 && zoomLevel > minZoom) {
+                // ズームアウト
+                zoomLevel = Math.max(minZoom, zoomLevel - zoomStep);
+            }
+            
+            applyZoom();
+        }
+    });
+}
+
+// ページ読み込み時の処理に追加
+document.addEventListener('DOMContentLoaded', () => {
+    loadData();
+    setupZoom();
+});
 
 
 // ページ読み込み時にデータを取得
