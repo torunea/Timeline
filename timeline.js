@@ -819,7 +819,9 @@ function checkAndDrawConnections(eventElement, eventsByTitle, isCollapsed, group
 // 既存の接続線をすべて削除
 function clearConnectionLines() {
     const existingLines = document.querySelectorAll('.event-connection-line');
-    existingLines.forEach(line => line.remove());
+    existingLines.forEach(line => {
+        line.remove(); // DOMから完全に削除
+    });
 }
 
 // 2つのイベント要素間に線を引く関数（拡大縮小に対応）
@@ -984,16 +986,23 @@ function setupZoom() {
         timeline.style.transformOrigin = 'left top'; // 基準点を左上に固定
         timeline.classList.toggle('zoomed', zoomLevel !== 1);
         
-        // 既存の線を削除
+        // レンダリングを強制的に更新（ブラウザの再描画を促す）
+        timeline.style.display = 'none';
+        timeline.offsetHeight; // 強制的なレイアウト計算を発生させる
+        timeline.style.display = '';
+        
+        // 接続線を全て削除
         clearConnectionLines();
         
-        // 新たに線を引き直す
-        // タイムアウトを設定して、DOM更新後に実行
-        setTimeout(() => {
+        // 再描画をスケジュール（少し遅延させる）
+        if (window.redrawTimeoutId) {
+            clearTimeout(window.redrawTimeoutId);
+        }
+        window.redrawTimeoutId = setTimeout(() => {
             if (window.currentPersons) {
                 connectRelatedEvents(window.currentPersons);
             }
-        }, 50);
+        }, 50); // 50ms遅延させる
     }
     
     // ズームイン

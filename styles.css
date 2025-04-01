@@ -218,6 +218,26 @@ h1 {
     /* min-height: 100%; を削除 */
 }
 
+/* バグ修正のための追加スタイル */
+.timeline {
+    backface-visibility: hidden; /* ブラウザのレンダリング問題を軽減 */
+    -webkit-backface-visibility: hidden;
+    will-change: transform; /* GPUアクセラレーションのヒント */
+}
+
+.person-lifespan, .event-item, .event-group {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: none !important; /* 不要なトランジションを無効化 */
+}
+
+/* トランジションを完全に無効化 */
+.event-connection-line {
+    transition: none !important;
+    animation: none !important;
+    will-change: auto;
+}
+
 /* タイムラインヘッダー（年の表示）を画面上部に固定 */
 .timeline-header {
     display: flex;
