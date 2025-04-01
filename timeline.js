@@ -420,6 +420,15 @@ function setupFilters(data, persons, birthDeathInfo) {
     const attributionFilter = document.getElementById('attribution-filter');
     const searchTypeSelect = document.getElementById('search-type');
     const categoryCheckboxes = document.querySelectorAll('input[name="category-filter"]');
+
+    // プルダウンのイベント伝播問題を修正
+    attributionFilter.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+    
+    searchTypeSelect.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
     
     // フィルタリング関数
     function applyFilters() {
@@ -599,6 +608,13 @@ function connectRelatedEvents(persons) {
             checkAndDrawConnections(item, eventsByTitle, true, group);
         });
     });
+    // 接続線を描画する前に、イベントプロパゲーションの問題を防ぐ
+    const allLines = document.querySelectorAll('.event-connection-line');
+    allLines.forEach(line => {
+        line.addEventListener('click', e => {
+            e.stopPropagation(); // イベントの伝播を止める
+        });
+    });
 }
 
 // イベント要素の説明文内の参照をチェックして線を引く関数
@@ -733,23 +749,27 @@ function drawConnectionLine(sourceEvent, targetEvent, sourceCollapsed, targetCol
     container.appendChild(line);
 }
 
-// アコーディオンの展開/折りたたみイベントハンドラを修正
+// アコーディオンの設定（既存のコードを尊重）
 function setupAccordion() {
     const accordionHeaders = document.querySelectorAll('.event-group-header');
     
     accordionHeaders.forEach(header => {
-        header.addEventListener('click', () => {
-            const group = header.parentElement;
-            const wasExpanded = group.classList.contains('expanded');
-            
-            // 展開/折りたたみ状態を切り替え
+        // 既存のイベントリスナーを削除（重複防止）
+        const clone = header.cloneNode(true);
+        header.parentNode.replaceChild(clone, header);
+        
+        // 新しいイベントリスナーを追加
+        clone.addEventListener('click', (e) => {
+            e.stopPropagation(); // イベントの伝播を止める
+            const group = clone.parentElement;
             group.classList.toggle('expanded');
             
             // アコーディオンの状態変更後に接続線を再描画
             setTimeout(() => {
-                // アニメーション完了後に線を再描画
-                connectRelatedEvents(currentPersons); // グローバル変数として最新のデータを保持
-            }, 300); // アコーディオンアニメーションの完了を待つ
+                if (window.currentPersons) {
+                    connectRelatedEvents(window.currentPersons);
+                }
+            }, 300);
         });
     });
 }
@@ -836,5 +856,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// ページ読み込み時にデータを取得
-document.addEventListener('DOMContentLoaded', loadData);
+// ページ読み込み時の処理
+document.addEventListener('DOMContentLoaded', () => {
+    // グローバル変数の初期化
+    window.currentPersons = null;
+    
+    // データ読み込み
+    loadData();
+    
+    // ズーム機能のセットアップ
+    setupZoom();
+    
+    // ドキュメント全体のクリックイベントの監視（デバッグ用）
+    document.addEventListener('click', (e) => {
+        console.log('Document clicked:', e.target);
+    });
+});
