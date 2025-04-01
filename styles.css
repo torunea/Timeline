@@ -444,6 +444,11 @@ h1 {
     color: #f8bbd0;
 }
 
+.event-affiliation {
+    background-color: #37474f;
+    color: #b0bec5;
+}
+
 .event-title {
     font-weight: bold;
     margin-bottom: 3px;
@@ -491,6 +496,10 @@ h1 {
 
 .badge-award {
     background-color: #c2185b;
+}
+
+.badge-affiliation {
+    background-color: #37474f;
 }
 
 /* イベントグループのスタイル */

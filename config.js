@@ -54,6 +54,7 @@ function getCategoryLabel(category) {
         'exhibition': '展覧会',
         'manifesto': '宣言',
         'award': '受賞',
+        'affiliation':'所属',
     };
     return labels[category] || category;
 }
