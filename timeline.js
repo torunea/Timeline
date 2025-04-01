@@ -656,10 +656,14 @@ function clearConnectionLines() {
     existingLines.forEach(line => line.remove());
 }
 
-// 2つのイベント要素間に線を引く関数（アコーディオン状態に対応）
+// 2つのイベント要素間に線を引く関数（拡大縮小に対応）
 function drawConnectionLine(sourceEvent, targetEvent, sourceCollapsed, targetCollapsed, originalSourceItem, originalTargetItem) {
     // 線を描画するコンテナ
     const container = document.querySelector('.timeline');
+    
+    // 現在のズームレベルを取得
+    const zoomLevelDisplay = document.getElementById('zoom-level');
+    const zoomLevel = parseFloat(zoomLevelDisplay.textContent) / 100 || 1;
     
     // イベント要素の位置を取得
     const sourceRect = sourceEvent.getBoundingClientRect();
@@ -671,26 +675,28 @@ function drawConnectionLine(sourceEvent, targetEvent, sourceCollapsed, targetCol
     // ソースとターゲットの接続ポイントを計算
     let sourceX, sourceY, targetX, targetY;
     
+    // ズームを考慮した位置計算
+    // getBoundingClientRectの値をズームレベルで調整
     // ソースの接続ポイント（折りたたまれているか展開されているかで切り替え）
     if (sourceCollapsed) {
         // 折りたたまれている場合はグループボックスの中心
-        sourceX = sourceRect.left + sourceRect.width / 2 - containerRect.left;
-        sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top;
+        sourceX = (sourceRect.left - containerRect.left) / zoomLevel + sourceRect.width / (2 * zoomLevel);
+        sourceY = (sourceRect.top - containerRect.top) / zoomLevel + sourceRect.height / (2 * zoomLevel);
     } else {
         // 展開されている場合は個別イベントの中心
-        sourceX = sourceRect.left + sourceRect.width / 2 - containerRect.left;
-        sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top;
+        sourceX = (sourceRect.left - containerRect.left) / zoomLevel + sourceRect.width / (2 * zoomLevel);
+        sourceY = (sourceRect.top - containerRect.top) / zoomLevel + sourceRect.height / (2 * zoomLevel);
     }
     
     // ターゲットの接続ポイント（折りたたまれているか展開されているかで切り替え）
     if (targetCollapsed) {
         // 折りたたまれている場合はグループボックスの中心
-        targetX = targetRect.left + targetRect.width / 2 - containerRect.left;
-        targetY = targetRect.top + targetRect.height / 2 - containerRect.top;
+        targetX = (targetRect.left - containerRect.left) / zoomLevel + targetRect.width / (2 * zoomLevel);
+        targetY = (targetRect.top - containerRect.top) / zoomLevel + targetRect.height / (2 * zoomLevel);
     } else {
         // 展開されている場合は個別イベントの中心
-        targetX = targetRect.left + targetRect.width / 2 - containerRect.left;
-        targetY = targetRect.top + targetRect.height / 2 - containerRect.top;
+        targetX = (targetRect.left - containerRect.left) / zoomLevel + targetRect.width / (2 * zoomLevel);
+        targetY = (targetRect.top - containerRect.top) / zoomLevel + targetRect.height / (2 * zoomLevel);
     }
     
     // 線要素の作成
@@ -719,6 +725,9 @@ function drawConnectionLine(sourceEvent, targetEvent, sourceCollapsed, targetCol
     line.style.left = `${sourceX}px`;
     line.style.top = `${sourceY}px`;
     line.style.transform = `rotate(${angle}deg)`;
+    
+    // ズーム対応のクラスを追加
+    line.classList.add('zoomed-line');
     
     // 線をDOMに追加
     container.appendChild(line);
@@ -758,7 +767,7 @@ function setupZoom() {
     const maxZoom = 2; // 最大ズーム
     const minZoom = 0.5; // 最小ズーム
     
-    // ズームレベルを適用する関数 - シンプル化バージョン
+    // ズームレベルを適用する関数
     function applyZoom() {
         // ズームレベルを表示
         zoomLevelDisplay.textContent = `${Math.round(zoomLevel * 100)}%`;
@@ -768,13 +777,16 @@ function setupZoom() {
         timeline.style.transformOrigin = 'left top'; // 基準点を左上に固定
         timeline.classList.toggle('zoomed', zoomLevel !== 1);
         
-        // 個別の要素調整は行わない
-        // updateYearMarkersWidth や updateEventPositions は呼び出さない
-
-        // ズーム後に線を再描画
-        if (window.currentPersons) {
-            connectRelatedEvents(window.currentPersons);
-        }
+        // 既存の線を削除
+        clearConnectionLines();
+        
+        // 新たに線を引き直す
+        // タイムアウトを設定して、DOM更新後に実行
+        setTimeout(() => {
+            if (window.currentPersons) {
+                connectRelatedEvents(window.currentPersons);
+            }
+        }, 50);
     }
     
     // ズームイン

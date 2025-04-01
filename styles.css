@@ -590,6 +590,10 @@ h1 {
     z-index: 5; /* イベントの下、タイムラインの上 */
 }
 
+.timeline.zoomed .event-connection-line {
+    transform-origin: left center !important;
+}
+
 /* スクロールバーをダークカラーにカスタマイズ */
 .timeline-scroll::-webkit-scrollbar {
     height: 10px;
