@@ -867,16 +867,31 @@ function drawConnectionLine(sourceEvent, targetEvent, sourceCollapsed, targetCol
     // 線を描画するコンテナ
     const container = document.querySelector('.timeline');
     
-    // ズームレベルの取得
+    // 現在のズームレベルを取得
     const zoomLevelDisplay = document.getElementById('zoom-level');
     const zoomLevel = parseFloat(zoomLevelDisplay.textContent) / 100 || 1;
     
-    // 位置計算を絶対座標に基づいて行う
-    sourceX = (sourceRect.left - containerRect.left) / zoomLevel + sourceRect.width / (2 * zoomLevel);
-    sourceY = (sourceRect.top - containerRect.top) / zoomLevel + sourceRect.height / (2 * zoomLevel);
+    // イベント要素の位置を取得
+    const sourceRect = sourceEvent.getBoundingClientRect();
+    const targetRect = targetEvent.getBoundingClientRect();
     
-    targetX = (targetRect.left - containerRect.left) / zoomLevel + targetRect.width / (2 * zoomLevel);
-    targetY = (targetRect.top - containerRect.top) / zoomLevel + targetRect.height / (2 * zoomLevel);
+    // タイムラインコンテナを基準にした相対位置を計算
+    const containerRect = container.getBoundingClientRect();
+    
+    // 位置計算を絶対座標に基づいて行う
+    // ズームレベルで補正して正確な位置を取得
+    
+    // 既存の変数宣言がある場合は再宣言せず、直接値を代入
+    // ソースの接続ポイントを計算（折りたたみ状態に応じて調整）
+    const adjustedSourceX = (sourceRect.left - containerRect.left) / zoomLevel + sourceRect.width / (2 * zoomLevel);
+    const adjustedSourceY = (sourceRect.top - containerRect.top) / zoomLevel + sourceRect.height / (2 * zoomLevel);
+    
+    // ターゲットの接続ポイントを計算（折りたたみ状態に応じて調整）
+    const adjustedTargetX = (targetRect.left - containerRect.left) / zoomLevel + targetRect.width / (2 * zoomLevel);
+    const adjustedTargetY = (targetRect.top - containerRect.top) / zoomLevel + targetRect.height / (2 * zoomLevel);
+
+    // 折りたたまれたグループ内のアイテムの場合、表示されていない可能性があるため
+    // グループ自体の位置を使用する
     
     // ソースの接続ポイントを計算
     let sourceX, sourceY;
