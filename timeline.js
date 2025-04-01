@@ -532,14 +532,28 @@ function setupZoom() {
     const maxZoom = 2; // 最大ズーム
     const minZoom = 0.5; // 最小ズーム
     
-    // ズームレベルを適用する関数
+    // ズームレベルを適用する関数内で
     function applyZoom() {
         timeline.style.transform = `scale(${zoomLevel})`;
         timeline.classList.toggle('zoomed', zoomLevel !== 1);
         zoomLevelDisplay.textContent = `${Math.round(zoomLevel * 100)}%`;
         
-        // ピクセル/年の値を調整（ズームに応じて調整）
-        updatePixelsPerYear();
+        // 年マーカーの幅を調整
+        updateYearMarkersWidth(zoomLevel);
+        
+        // イベントの位置も調整
+        updateEventPositions(zoomLevel);
+    }
+
+    // 年マーカーの幅を更新する関数を修正
+    function updateYearMarkersWidth(zoomLevel) {
+        const yearMarkers = document.querySelectorAll('.year-marker');
+        yearMarkers.forEach(marker => {
+            const year = parseInt(marker.getAttribute('data-year'));
+            const years = YEARS_PER_MARKER;
+            // 年マーカーの幅をズームレベルに応じて調整
+            marker.style.width = (PIXELS_PER_YEAR * years) + 'px';
+        });
     }
     
     // PIXELS_PER_YEARの値をズームに応じて更新
