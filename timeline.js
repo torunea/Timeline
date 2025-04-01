@@ -532,6 +532,17 @@ function setupFilters(data, persons, birthDeathInfo) {
         setTimeout(() => {
             connectRelatedEvents(window.currentPersons);
         }, 100);
+
+        // フィルタリング後、アコーディオンの状態をリセット
+        const allGroups = document.querySelectorAll('.event-group');
+        allGroups.forEach(group => {
+            group.classList.remove('expanded');
+        });
+        
+        // 線を再描画
+        setTimeout(() => {
+            connectRelatedEvents(filteredPersons);
+        }, 100);
     }
     
     // 検索機能のイベントリスナー（既存のコードと同じ）
@@ -553,6 +564,12 @@ function setupFilters(data, persons, birthDeathInfo) {
 
 // イベント間の関連性を検出して線を引く関数
 function connectRelatedEvents(persons) {
+    // 処理前に既存の線をクリアする（1回だけ行う）
+    clearConnectionLines();
+    
+    // すべてのイベントにデータ属性を確実に設定
+    setupEventIdentifiers();
+    
     // 先にすべてのイベント要素の辞書を作成（title → 要素のマップ）
     const eventsByTitle = new Map();
     
@@ -560,6 +577,9 @@ function connectRelatedEvents(persons) {
     const allEvents = document.querySelectorAll('.event-item, .event-group-item');
     
     allEvents.forEach(eventElement => {
+        // 要素が表示されていない場合はスキップ
+        if (!isElementVisible(eventElement)) return;
+        
         const titleElement = eventElement.querySelector('.event-title');
         if (titleElement) {
             const title = titleElement.textContent.trim();
@@ -573,6 +593,9 @@ function connectRelatedEvents(persons) {
     // 折りたたまれたイベントグループも収集
     const collapsedGroups = document.querySelectorAll('.event-group:not(.expanded)');
     collapsedGroups.forEach(group => {
+        // グループが表示されていない場合はスキップ
+        if (!isElementVisible(group)) return;
+        
         // グループ内のイベントのタイトルを取得
         const groupItems = group.querySelectorAll('.event-group-item');
         groupItems.forEach(item => {
@@ -592,28 +615,126 @@ function connectRelatedEvents(persons) {
         });
     });
     
-    // 線の描画前に既存の線をクリア
-    clearConnectionLines();
-    
     // 「」で囲まれた参照を検索して線を引く
     // 単一イベントのチェック
     allEvents.forEach(eventElement => {
+        // 要素が表示されていない場合はスキップ
+        if (!isElementVisible(eventElement)) return;
+        
         checkAndDrawConnections(eventElement, eventsByTitle, false);
     });
     
     // 折りたたまれたグループのチェック
     collapsedGroups.forEach(group => {
+        // グループが表示されていない場合はスキップ
+        if (!isElementVisible(group)) return;
+        
         const items = group.querySelectorAll('.event-group-item');
         items.forEach(item => {
             checkAndDrawConnections(item, eventsByTitle, true, group);
         });
     });
-    // 接続線を描画する前に、イベントプロパゲーションの問題を防ぐ
+    
+    // 接続線に対するイベントリスナーの設定
+    setupLineEventHandlers();
+    
+    // 線の描画を最適化
+    optimizeLineRendering();
+}
+
+// すべてのイベント要素にユニークなIDを設定
+function setupEventIdentifiers() {
+    // 単一イベントにID設定
+    const singleEvents = document.querySelectorAll('.event-item');
+    singleEvents.forEach((event, index) => {
+        if (!event.hasAttribute('data-event-id')) {
+            event.setAttribute('data-event-id', `single-event-${index}`);
+        }
+    });
+    
+    // グループにID設定
+    const groups = document.querySelectorAll('.event-group');
+    groups.forEach((group, groupIndex) => {
+        if (!group.hasAttribute('data-event-id')) {
+            group.setAttribute('data-event-id', `group-${groupIndex}`);
+        }
+        
+        // グループ内のアイテムにもID設定
+        const items = group.querySelectorAll('.event-group-item');
+        items.forEach((item, itemIndex) => {
+            if (!item.hasAttribute('data-event-id')) {
+                item.setAttribute('data-event-id', `item-${groupIndex}-${itemIndex}`);
+            }
+        });
+    });
+}
+
+// 接続線のイベントハンドラーを設定
+function setupLineEventHandlers() {
     const allLines = document.querySelectorAll('.event-connection-line');
     allLines.forEach(line => {
+        // クリックイベントの伝播を止める
         line.addEventListener('click', e => {
-            e.stopPropagation(); // イベントの伝播を止める
+            e.stopPropagation();
         });
+        
+        // ホバー時の強調表示（オプション）
+        line.addEventListener('mouseenter', () => {
+            line.classList.add('highlighted');
+        });
+        
+        line.addEventListener('mouseleave', () => {
+            line.classList.remove('highlighted');
+        });
+    });
+}
+
+// 要素が視覚的に表示されているかチェックする関数
+function isElementVisible(element) {
+    if (!element) return false;
+    
+    // 親要素を含めた表示チェック
+    let current = element;
+    while (current) {
+        // display: noneの場合は非表示
+        const style = window.getComputedStyle(current);
+        if (style.display === 'none') return false;
+        
+        current = current.parentElement;
+        // タイムライン本体まで到達したらループ終了
+        if (current && current.classList.contains('timeline')) break;
+    }
+    
+    const rect = element.getBoundingClientRect();
+    
+    // 要素のサイズがほぼ0の場合
+    if (rect.width < 2 || rect.height < 2) return false;
+    
+    return true;
+}
+
+// 線の描画を最適化する関数
+function optimizeLineRendering() {
+    // 短すぎる線や重なる線を非表示にする
+    const allLines = document.querySelectorAll('.event-connection-line');
+    allLines.forEach(line => {
+        // 線の長さを取得
+        const width = parseFloat(line.style.width);
+        
+        // 短すぎる線は非表示に（ノイズ防止）
+        if (width < 10) {
+            line.style.display = 'none';
+        }
+        
+        // 同じ接続の線が重複している場合は1つだけ表示
+        const connectionId = line.getAttribute('data-connection');
+        const duplicateLines = document.querySelectorAll(`[data-connection="${connectionId}"]`);
+        if (duplicateLines.length > 1) {
+            // 最初の1つ以外は非表示
+            for (let i = 1; i < duplicateLines.length; i++) {
+                duplicateLines[i].style.display = 'none';
+            }
+        }
     });
 }
 
@@ -688,31 +809,52 @@ function drawConnectionLine(sourceEvent, targetEvent, sourceCollapsed, targetCol
     // タイムラインコンテナを基準にした相対位置を計算
     const containerRect = container.getBoundingClientRect();
     
-    // ソースとターゲットの接続ポイントを計算
-    let sourceX, sourceY, targetX, targetY;
+    // 折りたたまれたグループ内のアイテムの場合、表示されていない可能性があるため
+    // グループ自体の位置を使用する
     
-    // ズームを考慮した位置計算
-    // getBoundingClientRectの値をズームレベルで調整
-    // ソースの接続ポイント（折りたたまれているか展開されているかで切り替え）
+    // ソースの接続ポイントを計算
+    let sourceX, sourceY;
     if (sourceCollapsed) {
-        // 折りたたまれている場合はグループボックスの中心
-        sourceX = (sourceRect.left - containerRect.left) / zoomLevel + sourceRect.width / (2 * zoomLevel);
-        sourceY = (sourceRect.top - containerRect.top) / zoomLevel + sourceRect.height / (2 * zoomLevel);
+        // 折りたたまれている場合はグループヘッダーの中心を使用
+        const headerElement = sourceEvent.querySelector('.event-group-header');
+        if (headerElement) {
+            const headerRect = headerElement.getBoundingClientRect();
+            sourceX = (headerRect.left - containerRect.left) / zoomLevel + headerRect.width / (2 * zoomLevel);
+            sourceY = (headerRect.top - containerRect.top) / zoomLevel + headerRect.height / (2 * zoomLevel);
+        } else {
+            // ヘッダーが見つからない場合は要素全体の中心を使用
+            sourceX = (sourceRect.left - containerRect.left) / zoomLevel + sourceRect.width / (2 * zoomLevel);
+            sourceY = (sourceRect.top - containerRect.top) / zoomLevel + sourceRect.height / (2 * zoomLevel);
+        }
     } else {
         // 展開されている場合は個別イベントの中心
         sourceX = (sourceRect.left - containerRect.left) / zoomLevel + sourceRect.width / (2 * zoomLevel);
         sourceY = (sourceRect.top - containerRect.top) / zoomLevel + sourceRect.height / (2 * zoomLevel);
     }
     
-    // ターゲットの接続ポイント（折りたたまれているか展開されているかで切り替え）
+    // ターゲットの接続ポイントを計算
+    let targetX, targetY;
     if (targetCollapsed) {
-        // 折りたたまれている場合はグループボックスの中心
-        targetX = (targetRect.left - containerRect.left) / zoomLevel + targetRect.width / (2 * zoomLevel);
-        targetY = (targetRect.top - containerRect.top) / zoomLevel + targetRect.height / (2 * zoomLevel);
+        // 折りたたまれている場合はグループヘッダーの中心を使用
+        const headerElement = targetEvent.querySelector('.event-group-header');
+        if (headerElement) {
+            const headerRect = headerElement.getBoundingClientRect();
+            targetX = (headerRect.left - containerRect.left) / zoomLevel + headerRect.width / (2 * zoomLevel);
+            targetY = (headerRect.top - containerRect.top) / zoomLevel + headerRect.height / (2 * zoomLevel);
+        } else {
+            // ヘッダーが見つからない場合は要素全体の中心を使用
+            targetX = (targetRect.left - containerRect.left) / zoomLevel + targetRect.width / (2 * zoomLevel);
+            targetY = (targetRect.top - containerRect.top) / zoomLevel + targetRect.height / (2 * zoomLevel);
+        }
     } else {
         // 展開されている場合は個別イベントの中心
         targetX = (targetRect.left - containerRect.left) / zoomLevel + targetRect.width / (2 * zoomLevel);
         targetY = (targetRect.top - containerRect.top) / zoomLevel + targetRect.height / (2 * zoomLevel);
+    }
+    
+    // 要素が見えない場合は線を描画しない
+    if (!isElementVisible(sourceEvent) || !isElementVisible(targetEvent)) {
+        return;
     }
     
     // 線要素の作成
@@ -742,11 +884,27 @@ function drawConnectionLine(sourceEvent, targetEvent, sourceCollapsed, targetCol
     line.style.top = `${sourceY}px`;
     line.style.transform = `rotate(${angle}deg)`;
     
-    // ズーム対応のクラスを追加
-    line.classList.add('zoomed-line');
-    
     // 線をDOMに追加
     container.appendChild(line);
+}
+
+// 要素が視覚的に表示されているかチェックする関数
+function isElementVisible(element) {
+    if (!element) return false;
+    
+    const rect = element.getBoundingClientRect();
+    
+    // 要素のサイズがほぼ0の場合（非表示と見なす）
+    if (rect.width <= 1 || rect.height <= 1) return false;
+    
+    // 要素がビューポート外にある場合
+    if (rect.top + rect.height <= 0 || rect.left + rect.width <= 0) return false;
+    
+    // display: noneやvisibility: hiddenのチェック
+    const computedStyle = window.getComputedStyle(element);
+    if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden') return false;
+    
+    return true;
 }
 
 // アコーディオンの設定（既存のコードを尊重）
