@@ -238,6 +238,21 @@ h1 {
     will-change: auto;
 }
 
+/* イベントボックスのサイズを安定させるためのCSS */
+.event-item, .event-group {
+    box-sizing: border-box !important;
+    width: var(--pixels-per-year, 200px) !important; /* デフォルト幅を変数で設定 */
+    min-width: var(--pixels-per-year, 200px) !important;
+    transform-origin: left top !important;
+}
+
+/* ズーム時のスタイル */
+.timeline.zoomed .event-item,
+.timeline.zoomed .event-group {
+    /* タイムライン全体のtransformが効くので、個別の要素はtransformしない */
+    transform: none !important;
+}
+
 /* タイムラインヘッダー（年の表示）を画面上部に固定 */
 .timeline-header {
     display: flex;

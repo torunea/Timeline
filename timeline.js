@@ -261,8 +261,14 @@ function renderTimeline(persons, birthDeathInfo) {
                 eventElement.setAttribute('data-category', item.category);
                 eventElement.setAttribute('data-year', year); // 年を記録
                 
+                // ユニークなIDを設定（接続線のために必要）
+                const eventId = `event-${personName}-${year}-${Math.random().toString(36).substr(2, 5)}`;
+                eventElement.setAttribute('data-event-id', eventId);
+                
                 eventElement.style.left = position + 'px';
                 eventElement.style.width = PIXELS_PER_YEAR + 'px';
+                // オリジナルサイズを保存（拡大縮小用）
+                eventElement.setAttribute('data-original-width', PIXELS_PER_YEAR + 'px');
                 
                 // イベント種類
                 const typeElement = document.createElement('div');
@@ -289,8 +295,15 @@ function renderTimeline(persons, birthDeathInfo) {
                 // 複数イベントの場合はアコーディオン表示
                 const groupElement = document.createElement('div');
                 groupElement.className = 'event-group';
+                
+                // ユニークなグループIDを設定
+                const groupId = `group-${personName}-${year}-${Math.random().toString(36).substr(2, 5)}`;
+                groupElement.setAttribute('data-event-id', groupId);
+                
                 groupElement.style.left = position + 'px';
                 groupElement.style.width = PIXELS_PER_YEAR + 'px';
+                // オリジナルサイズを保存（拡大縮小用）
+                groupElement.setAttribute('data-original-width', PIXELS_PER_YEAR + 'px');
                 groupElement.setAttribute('data-year', year); // 年を記録
 
                 // ヘッダー（カテゴリごとの件数を表示）
@@ -319,10 +332,14 @@ function renderTimeline(persons, birthDeathInfo) {
                 contentElement.className = 'event-group-content';
                 
                 // 各イベントをコンテンツに追加
-                events.forEach(item => {
+                events.forEach((item, index) => {
                     const eventItem = document.createElement('div');
                     eventItem.className = 'event-group-item';
                     eventItem.setAttribute('data-category', item.category);
+                    
+                    // 各グループ内アイテムにユニークなIDを設定
+                    const itemId = `item-${groupId}-${index}`;
+                    eventItem.setAttribute('data-event-id', itemId);
                     
                     // イベント種類
                     const typeElement = document.createElement('div');
@@ -351,8 +368,17 @@ function renderTimeline(persons, birthDeathInfo) {
                 groupElement.appendChild(contentElement);
                 
                 // クリックで展開/折りたたみ
-                headerElement.addEventListener('click', () => {
+                headerElement.addEventListener('click', (e) => {
+                    e.stopPropagation(); // イベントの伝播を止める
                     groupElement.classList.toggle('expanded');
+                    
+                    // 展開/折りたたみ後に接続線を再描画
+                    if (window.currentPersons) {
+                        setTimeout(() => {
+                            clearConnectionLines(); // 既存の線をクリア
+                            connectRelatedEvents(window.currentPersons);
+                        }, 300); // アコーディオンアニメーション完了後
+                    }
                 });
                 
                 timelineContainer.appendChild(groupElement);
@@ -461,6 +487,10 @@ function setupFilters(data, persons, birthDeathInfo) {
     
     // フィルタリング関数
     function applyFilters() {
+        // 現在のズームレベルを保存
+        const zoomLevelDisplay = document.getElementById('zoom-level');
+        const currentZoom = parseFloat(zoomLevelDisplay.textContent) / 100 || 1;
+        
         const searchTerm = searchBox.value.toLowerCase().trim();
         const selectedAttribution = attributionFilter.value;
         const searchType = searchTypeSelect ? searchTypeSelect.value : 'or';
@@ -553,25 +583,48 @@ function setupFilters(data, persons, birthDeathInfo) {
         
         // 絞り込み結果で年表を再描画
         renderTimeline(filteredPersons, birthDeathInfo);
-
+        
         // フィルタリング結果をグローバル変数に保存
         window.currentPersons = filteredPersons;
-
-        // フィルタリング後、線を再描画するためのタイムアウト設定
-        setTimeout(() => {
-            connectRelatedEvents(window.currentPersons);
-        }, 100);
-
+        window.birthDeathInfo = birthDeathInfo;  // 生没年情報も保存
+        
         // フィルタリング後、アコーディオンの状態をリセット
         const allGroups = document.querySelectorAll('.event-group');
         allGroups.forEach(group => {
             group.classList.remove('expanded');
         });
         
-        // 線を再描画
+        // ズームレベルを再適用（フィルタリング後）
+        if (currentZoom !== 1) {
+            const timeline = document.getElementById('timeline');
+            timeline.style.transform = `scale(${currentZoom})`;
+            timeline.style.transformOrigin = 'left top';
+            timeline.classList.add('zoomed');
+            
+            // イベントボックスのサイズを正規化する
+            normalizeEventBoxSizes();
+        }
+        
+        // 線を再描画（1回だけ実行）
         setTimeout(() => {
+            clearConnectionLines();  // 既存の線を確実に削除
             connectRelatedEvents(filteredPersons);
         }, 100);
+    }
+    
+    // イベントボックスのサイズを正規化する関数
+    function normalizeEventBoxSizes() {
+        // イベントアイテムのサイズを正規化
+        const eventItems = document.querySelectorAll('.event-item');
+        eventItems.forEach(item => {
+            item.style.width = `${PIXELS_PER_YEAR}px`;
+        });
+        
+        // イベントグループのサイズを正規化
+        const eventGroups = document.querySelectorAll('.event-group');
+        eventGroups.forEach(group => {
+            group.style.width = `${PIXELS_PER_YEAR}px`;
+        });
     }
     
     // 検索機能のイベントリスナー（既存のコードと同じ）
