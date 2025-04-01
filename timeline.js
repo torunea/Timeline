@@ -1,42 +1,11 @@
-// CSVデータを読み込む
+// CSVデータを読み込む関数を更新
 async function loadData() {
     try {
-        const response = await fetch(CSV_URL);
+        // 複数のソースからデータを読み込む
+        const combinedData = await loadMultipleSheets(SPREADSHEET_SOURCES);
         
-        if (!response.ok) {
-            throw new Error(`HTTPエラー: ${response.status}`);
-        }
-        
-        const csvText = await response.text();
-        
-        if (!csvText || csvText.trim() === '') {
-            throw new Error('CSVデータが空です');
-        }
-        
-        // デバッグ情報
-        console.log('CSVデータ取得成功 (先頭部分):', csvText.substring(0, 200));
-        
-        // Papa Parse を使って CSV をパース
-        Papa.parse(csvText, {
-            header: true,
-            dynamicTyping: true,
-            skipEmptyLines: true,
-            complete: function(results) {
-                console.log('CSVパース結果:', results);
-                
-                if (!results.data || results.data.length === 0) {
-                    throw new Error('パースしたデータが空です');
-                }
-                
-                // パースしたデータを処理
-                processData(results.data);
-            },
-            error: function(error) {
-                console.error('CSVのパースに失敗しました:', error);
-                // エラー時はサンプルデータを使用
-                processData(SAMPLE_DATA);
-            }
-        });
+        // パースしたデータを処理
+        processData(combinedData);
     } catch (error) {
         console.error('データの取得に失敗しました:', error);
         
@@ -50,7 +19,6 @@ async function loadData() {
         errorDetails.innerHTML = `
             <h3>データ取得エラー</h3>
             <p>エラーメッセージ: ${error.message}</p>
-            <p>CSV URL: ${CSV_URL}</p>
             <p>注: サンプルデータを使用して表示します</p>
         `;
         document.getElementById('timeline').innerHTML = '';
@@ -59,6 +27,67 @@ async function loadData() {
         // エラー時はサンプルデータを使用
         processData(SAMPLE_DATA);
     }
+}
+
+// 複数のシートから読み込む関数
+async function loadMultipleSheets(sourceList) {
+    // すべてのシートを並行して読み込む
+    const fetchPromises = sourceList.map(async (source) => {
+        try {
+            const response = await fetch(source.url);
+            
+            if (!response.ok) {
+                console.error(`HTTPエラー: ${response.status} for ${source.name}`);
+                return [];
+            }
+            
+            const csvText = await response.text();
+            
+            if (!csvText || csvText.trim() === '') {
+                console.error(`CSVデータが空です: ${source.name}`);
+                return [];
+            }
+            
+            // デバッグ情報
+            console.log(`${source.name} データ取得成功 (先頭部分):`, csvText.substring(0, 200));
+            
+            // Papa Parse を使って CSV をパース
+            return new Promise((resolve) => {
+                Papa.parse(csvText, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        console.log(`${source.name} パース結果:`, results);
+                        
+                        if (!results.data || results.data.length === 0) {
+                            console.warn(`パースしたデータが空です: ${source.name}`);
+                            resolve([]);
+                            return;
+                        }
+                        
+                        resolve(results.data);
+                    },
+                    error: function(error) {
+                        console.error(`CSVのパースに失敗しました: ${source.name}`, error);
+                        resolve([]);  // エラー時は空配列を返す
+                    }
+                });
+            });
+        } catch (error) {
+            console.error(`データソース読み込みエラー: ${source.name}`, error);
+            return []; // エラー時は空配列を返す
+        }
+    });
+    
+    // すべてのPromiseの結果を待つ
+    const allData = await Promise.all(fetchPromises);
+    
+    // 結果を1つの配列に結合
+    const combinedData = allData.flat();
+    console.log('すべてのデータを結合した結果:', combinedData);
+    
+    return combinedData;
 }
 
 // データの処理と年表の表示

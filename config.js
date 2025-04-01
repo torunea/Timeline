@@ -1,8 +1,26 @@
 // 設定ファイル
 
-// CSV として公開されたスプレッドシートの URL
-// あなたのスプレッドシートのCSV公開URLに置き換えてください
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pub?output=csv';
+// 複数のCSVスプレッドシートの設定
+const SPREADSHEET_SOURCES = [
+    {
+        name: "主要データ",
+        url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pub?output=csv'
+    },
+    /*
+    // 追加のデータソースをここに記述
+    {
+        name: "追加データ1",
+        url: 'https://docs.google.com/spreadsheets/d/e/XXXX-YOUR-SECOND-SHEET-ID/pub?output=csv'
+    },
+    {
+        name: "追加データ2",
+        url: 'https://docs.google.com/spreadsheets/d/e/XXXX-YOUR-THIRD-SHEET-ID/pub?output=csv'
+    }
+    */
+];
+
+// 後方互換性のために単一URLも保持
+const CSV_URL = SPREADSHEET_SOURCES[0].url;
 
 // 年表の設定
 const START_YEAR = 1950;
