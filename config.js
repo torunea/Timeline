@@ -39,6 +39,7 @@ function getAttributionLabel(attribution) {
         'philosopher': '哲学者',
         'videographer': '映像作家',
         'musician': '音楽家',
+        'concept': '概念',
         'default': 'その他'
     };
     return labels[attribution] || attribution;
@@ -54,6 +55,8 @@ function getCategoryLabel(category) {
         'exhibition': '展覧会',
         'manifesto': '宣言',
         'award': '受賞',
+        'ideology': '思想',
+        'anthology': '作品集',
         'affiliation':'所属',
     };
     return labels[category] || category;

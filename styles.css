@@ -368,6 +368,11 @@ h1 {
     border: 1px solid rgba(186, 85, 211, 0.3);
 }
 
+.attribution-concept {
+    background-color: rgba(32, 178, 170, 0.15);
+    border: 1px solid rgba(32, 178, 170, 0.3);
+}
+
 .attribution-default {
     background-color: rgba(169, 169, 169, 0.15);
     border: 1px solid rgba(169, 169, 169, 0.3);
@@ -444,6 +449,16 @@ h1 {
     color: #f8bbd0;
 }
 
+.event-ideology {
+    background-color: #e65100;
+    color: #ffe0b2;
+}
+
+.event-anthology {
+    background-color: #1a237e;
+    color: #c5cae9;
+}
+
 .event-affiliation {
     background-color: #37474f;
     color: #b0bec5;
@@ -496,6 +511,14 @@ h1 {
 
 .badge-award {
     background-color: #c2185b;
+}
+
+.event-ideology {
+    background-color: #e65100;
+}
+
+.event-anthology {
+    background-color: #1a237e;
 }
 
 .badge-affiliation {
