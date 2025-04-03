@@ -16,7 +16,7 @@ const SPREADSHEET_SOURCES = [
     {
         name: "image",
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQo3hjD2qsO5REuptxFxRrWDxbrjmu9tc92dI_DZcihUKSmRL9A8M_i_TT3v0IFYWz9OzwIxtcNRhkz/pub?output=csv'
-    }
+    },
 ];
 
 // 後方互換性のために単一URLも保持
