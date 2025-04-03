@@ -363,6 +363,11 @@ h1 {
     border: 1px solid rgba(184, 134, 11, 0.3);
 }
 
+.attribution-photographer {
+    background-color: rgba(0, 128, 128, 0.15);
+    border: 1px solid rgba(0, 128, 128, 0.3);
+}
+
 .attribution-musician {
     background-color: rgba(186, 85, 211, 0.15);
     border: 1px solid rgba(186, 85, 211, 0.3);
