@@ -2,6 +2,7 @@
 
 // 複数のCSVスプレッドシートの設定
 const SPREADSHEET_SOURCES = [
+/*
     {
         name: "birth-death",
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pub?output=csv'
@@ -16,6 +17,11 @@ const SPREADSHEET_SOURCES = [
     {
         name: "image",
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQo3hjD2qsO5REuptxFxRrWDxbrjmu9tc92dI_DZcihUKSmRL9A8M_i_TT3v0IFYWz9OzwIxtcNRhkz/pub?output=csv'
+    },
+*/
+    {
+        name: "situationniste",
+        url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRKeU1QbCEo-OUadshZM3doLp4STqlLV5_C-xd3_4BniuSoENKY5H0oNAJO1QsLj2SylUP60v1RKBBs/pub?output=csv'
     },
 ];
 
