@@ -35,7 +35,7 @@ const SPREADSHEET_SOURCES = [
 const CSV_URL = SPREADSHEET_SOURCES[0].url;
 
 // 年表の設定
-const START_YEAR = 1950;
+const START_YEAR = 1790;
 const END_YEAR = 2025;
 const YEARS_PER_MARKER = 1;
 const PIXELS_PER_YEAR = 200; // .year-markerの幅と一致させる
