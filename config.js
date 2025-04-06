@@ -18,11 +18,17 @@ const SPREADSHEET_SOURCES = [
         name: "image",
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQo3hjD2qsO5REuptxFxRrWDxbrjmu9tc92dI_DZcihUKSmRL9A8M_i_TT3v0IFYWz9OzwIxtcNRhkz/pub?output=csv'
     },
-*/
+
     {
         name: "situationniste",
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRKeU1QbCEo-OUadshZM3doLp4STqlLV5_C-xd3_4BniuSoENKY5H0oNAJO1QsLj2SylUP60v1RKBBs/pub?output=csv'
     },
+*/
+    {
+        name: "competition",
+        url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9wGh47q5Y1e-fGE_ciCvSev0zeK30kkVDxV0zC7iFgPoXU4F_ZbA7c_06OZVznw1WyiWo4OGs3ppJ/pub?output=csv'
+    },
+
 ];
 
 // 後方互換性のために単一URLも保持
