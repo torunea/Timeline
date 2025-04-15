@@ -2,7 +2,7 @@
 
 // 複数のCSVスプレッドシートの設定
 const SPREADSHEET_SOURCES = [
-/*
+
     {
         name: "birth-death",
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSikAHCTE4Mmr8UGPf3oIyfOlhy4tvTMlruQdKR91ulu3mVBpUmm1MuHzTRnVtORddOPpHrs2Ua8omT/pub?output=csv'
@@ -13,7 +13,7 @@ const SPREADSHEET_SOURCES = [
         name: "Timeline",
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSG7K-ORBszxO5obK_mmc4N0BtaxnONpACJlzPM8fXx1thv9NJEHuthRZxzybK0XeO2MiO9n-TAGUsn/pub?output=csv'
     },
-
+/*
     {
         name: "image",
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQo3hjD2qsO5REuptxFxRrWDxbrjmu9tc92dI_DZcihUKSmRL9A8M_i_TT3v0IFYWz9OzwIxtcNRhkz/pub?output=csv'
@@ -23,12 +23,12 @@ const SPREADSHEET_SOURCES = [
         name: "situationniste",
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRKeU1QbCEo-OUadshZM3doLp4STqlLV5_C-xd3_4BniuSoENKY5H0oNAJO1QsLj2SylUP60v1RKBBs/pub?output=csv'
     },
-*/
+
     {
         name: "competition",
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS9wGh47q5Y1e-fGE_ciCvSev0zeK30kkVDxV0zC7iFgPoXU4F_ZbA7c_06OZVznw1WyiWo4OGs3ppJ/pub?output=csv'
     },
-
+*/
 ];
 
 // 後方互換性のために単一URLも保持
